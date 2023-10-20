@@ -1,4 +1,4 @@
-package de.sgey;
+package spielereien;
 
 import java.time.LocalDate;
 
