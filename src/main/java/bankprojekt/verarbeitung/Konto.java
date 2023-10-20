@@ -242,11 +242,10 @@ public abstract class Konto implements Comparable<Konto> {
      * @throws IllegalArgumentException wenn der Betrag negativ oder kein endlicher Wert ist
      */
     public void einzahlen(double betrag, Waehrung waehrung) {
-        if (betrag < 0 || !Doubles.isFinite(betrag)) {
-            throw new IllegalArgumentException("Falscher Betrag");
-        }
         double betragInEUR = waehrung.waehrungInEuroUmrechnen(betrag);
-        setKontostand(getKontostand() + getAktuelleWaehrung().euroInWaehrungUmrechnen(betragInEUR));
+        double betragInKontoWaehrung = getAktuelleWaehrung().euroInWaehrungUmrechnen(betragInEUR);
+
+        einzahlen(betragInKontoWaehrung);
     }
 
     /**
