@@ -19,7 +19,7 @@ public class Dividieren {
             throw new IllegalArgumentException("Bitte geben Sie eine gültige Zahl ein");
         }
 
-        System.out.printf("Geben Sie nun die Zahl ein, durch welche Sie teilen wollen:");
+        System.out.println("Geben Sie nun die Zahl ein, durch welche Sie teilen wollen:");
         try {
             number2 = scanner2.nextBigDecimal();
         } catch (Exception e){
