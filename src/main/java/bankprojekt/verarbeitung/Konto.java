@@ -244,6 +244,7 @@ public abstract class Konto implements Comparable<Konto> {
     public void einzahlen(double betrag, Waehrung waehrung) {
         double betragInEUR = waehrung.waehrungInEuroUmrechnen(betrag);
         double betragInKontoWaehrung = getAktuelleWaehrung().euroInWaehrungUmrechnen(betragInEUR);
+
         einzahlen(betragInKontoWaehrung);
     }
 

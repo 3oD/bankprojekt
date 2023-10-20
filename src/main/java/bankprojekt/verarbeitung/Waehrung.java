@@ -30,9 +30,14 @@ public enum Waehrung {
      * Converts the given amount in Euros to the currency defined by the instance of the class.
      *
      * @param betrag the amount in Euros to be converted to the currency
-     * @return the converted amount in the currency defined by the instance of the class
+     * @return the converted amount in the currency
+     * @throws IllegalArgumentException if the amount is negative or not a finite value
      */
-    public double euroInWaehrungUmrechnen(double betrag) {
+    public double euroInWaehrungUmrechnen(double betrag) throws IllegalArgumentException {
+        if (betrag < 0 || Double.isNaN(betrag) || Double.isInfinite(betrag)) {
+            throw new IllegalArgumentException("Betrag ungültig");
+        }
+
         return betrag * this.euroKurs;
     }
 
@@ -41,8 +46,13 @@ public enum Waehrung {
      *
      * @param betrag the amount in the currency to be converted to Euros
      * @return the converted amount in Euros
+     * @throws IllegalArgumentException if the amount is negative or not a finite value
      */
-    public double waehrungInEuroUmrechnen(double betrag) {
+    public double waehrungInEuroUmrechnen(double betrag) throws IllegalArgumentException {
+        if (betrag < 0 || Double.isNaN(betrag) || Double.isInfinite(betrag)) {
+            throw new IllegalArgumentException("Betrag ungültig");
+        }
+
         return betrag / this.euroKurs;
     }
 }
