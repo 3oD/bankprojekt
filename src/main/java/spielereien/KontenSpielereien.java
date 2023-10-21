@@ -29,7 +29,7 @@ public class KontenSpielereien {
 
 		Kunde ich = new Kunde("Dorothea", "Hubrich", "zuhause", LocalDate.parse("1976-07-13"));
 
-		Girokonto meinGiro = new Girokonto(ich, 1234, 1000.0, Waehrung.EUR);
+		Girokonto meinGiro = new Girokonto(ich, 1234, 1000.0);
 		//meinGiro.einzahlen(50);
 		System.out.println(meinGiro);
 

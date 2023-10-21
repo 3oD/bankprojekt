@@ -19,7 +19,7 @@ public class Waehrungsspielereien {
 	public static void main(String[] args)  {
 		try {
 			Kunde ich = new Kunde("Dorothea", "Hubrich", "zuhause", LocalDate.parse("1976-07-13"));
-			Konto meinKonto = new Girokonto(ich, 1234, 1000.0, Waehrung.EUR);
+			Konto meinKonto = new Girokonto(ich, 1234, 1000.0);
 
 			meinKonto.waehrungswechsel(Waehrung.BGN);
 			System.out.println("Nach Währungswechsel nach BGN: " + meinKonto);

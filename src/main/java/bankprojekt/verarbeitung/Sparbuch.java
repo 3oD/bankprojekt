@@ -50,7 +50,7 @@ public class Sparbuch extends Konto {
      * @throws IllegalArgumentException wenn inhaber null ist
      */
     public Sparbuch(Kunde inhaber, long kontonummer) {
-        super(inhaber, kontonummer, Waehrung.EUR);
+        super(inhaber, kontonummer);
         zinssatz = 0.03;
     }
 

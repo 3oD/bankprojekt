@@ -1,18 +1,30 @@
 package bankprojekt.verarbeitung;
 
 
+import org.decimal4j.util.DoubleRounder;
+
+import java.math.RoundingMode;
+
 /**
  * The Waehrung class represents a currency with its exchange rate to Euros.
  * It provides methods to convert amounts between Euros and the currency defined by the instance of the class.
  */
 public enum Waehrung {
-    /** Euro */
+    /**
+     * Euro
+     */
     EUR(1),
-    /** Bulgarische Lew */
+    /**
+     * Bulgarische Lew
+     */
     BGN(1.9558),
-    /** Dänische Krone */
+    /**
+     * Dänische Krone
+     */
     DKK(7.4604),
-    /** Mazedonischer Denar */
+    /**
+     * Mazedonischer Denar
+     */
     MKD(61.62);
 
     private final double euroKurs;
@@ -38,7 +50,7 @@ public enum Waehrung {
             throw new IllegalArgumentException("Betrag ungültig");
         }
 
-        return betrag * this.euroKurs;
+        return DoubleRounder.round(betrag * this.euroKurs, 2, RoundingMode.DOWN);
     }
 
     /**
@@ -52,7 +64,6 @@ public enum Waehrung {
         if (betrag < 0 || Double.isNaN(betrag) || Double.isInfinite(betrag)) {
             throw new IllegalArgumentException("Betrag ungültig");
         }
-
-        return betrag / this.euroKurs;
+        return DoubleRounder.round(betrag / this.euroKurs, 2, RoundingMode.DOWN);
     }
 }

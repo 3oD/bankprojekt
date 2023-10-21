@@ -22,7 +22,7 @@ public abstract class Konto implements Comparable<Konto> {
     private double kontostand;
 
     /** die aktuelle Währung */
-    private Waehrung waehrung;
+    private Waehrung waehrung = Waehrung.EUR;
 
     /**
      * setzt den aktuellen Kontostand
@@ -47,13 +47,12 @@ public abstract class Konto implements Comparable<Konto> {
      * @param kontonummer die gewünschte Kontonummer
      * @throws IllegalArgumentException wenn der inhaber null ist
      */
-    public Konto(Kunde inhaber, long kontonummer, Waehrung waehrung) {
+    public Konto(Kunde inhaber, long kontonummer) {
         if (inhaber == null)
             throw new IllegalArgumentException("Inhaber darf nicht null sein!");
         this.inhaber = inhaber;
         this.nummer = kontonummer;
         this.kontostand = 0;
-        this.waehrung = waehrung;
         this.gesperrt = false;
     }
 
@@ -61,7 +60,7 @@ public abstract class Konto implements Comparable<Konto> {
      * setzt alle Eigenschaften des Kontos auf Standardwerte
      */
     public Konto() {
-        this(Kunde.MUSTERMANN, 1234567, Waehrung.EUR);
+        this(Kunde.MUSTERMANN, 1234567);
     }
 
     /**
