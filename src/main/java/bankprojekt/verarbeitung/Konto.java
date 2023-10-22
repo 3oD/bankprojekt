@@ -21,7 +21,9 @@ public abstract class Konto implements Comparable<Konto> {
      */
     private double kontostand;
 
-    /** die aktuelle Währung */
+    /**
+     * die aktuelle Währung
+     */
     private Waehrung waehrung = Waehrung.EUR;
 
     /**
@@ -256,8 +258,12 @@ public abstract class Konto implements Comparable<Konto> {
      * @throws GesperrtException        wenn das Konto gesperrt ist
      * @throws IllegalArgumentException wenn der Betrag negativ oder unendlich oder NaN ist
      */
-    public abstract boolean abheben(double betrag, Waehrung waehrung)
-            throws GesperrtException;
+    public boolean abheben(double betrag, Waehrung waehrung) throws GesperrtException {
+        double betragInEUR = waehrung.waehrungInEuroUmrechnen(betrag);
+        double betragInKontoWaehrung = getAktuelleWaehrung().euroInWaehrungUmrechnen(betragInEUR);
+
+        return abheben(betragInKontoWaehrung);
+    }
 
     /**
      * Ruft die aktuelle Währung ab, die mit diesem Konto verbunden ist.
@@ -274,6 +280,9 @@ public abstract class Konto implements Comparable<Konto> {
      * @param neu die neue Währung, die mit dem Konto verknüpft werden soll
      */
     public void waehrungswechsel(Waehrung neu) {
+        double kontostandInEUR = getAktuelleWaehrung().waehrungInEuroUmrechnen(getKontostand());
+        setKontostand(neu.euroInWaehrungUmrechnen(kontostandInEUR));
+
         this.waehrung = neu;
     }
 
