@@ -19,7 +19,7 @@ public class Girokonto extends Konto implements Ueberweisungsfaehig {
      * von Max MUSTERMANN
      */
     public Girokonto() {
-        super(Kunde.MUSTERMANN, 99887766, Waehrung.EUR);
+        super(Kunde.MUSTERMANN, 99887766);
         this.dispo = 500;
     }
 
@@ -31,8 +31,8 @@ public class Girokonto extends Konto implements Ueberweisungsfaehig {
      * @param dispo   Dispo
      * @throws IllegalArgumentException wenn der inhaber null ist oder der angegebene dispo negativ bzw. NaN ist
      */
-    public Girokonto(Kunde inhaber, long nummer, double dispo, Waehrung waehrung) {
-        super(inhaber, nummer, waehrung);
+    public Girokonto(Kunde inhaber, long nummer, double dispo) {
+        super(inhaber, nummer);
         if (dispo < 0 || Double.isNaN(dispo) || Double.isInfinite(dispo))
             throw new IllegalArgumentException("Der Dispo ist nicht gültig!");
         this.dispo = dispo;
@@ -105,21 +105,11 @@ public class Girokonto extends Konto implements Ueberweisungsfaehig {
     }
 
     @Override
-    public boolean abheben(double betrag, Waehrung waehrung) throws GesperrtException {
-        double betragInEUR = waehrung.waehrungInEuroUmrechnen(betrag);
-        double betragInKontoWaehrung = getAktuelleWaehrung().euroInWaehrungUmrechnen(betragInEUR);
-
-        return abheben(betragInKontoWaehrung);
-    }
-
-    @Override
     public void waehrungswechsel(Waehrung neu) {
         /** rechne Kontostand in Euro um */
-        double kontostandInEUR = getAktuelleWaehrung().waehrungInEuroUmrechnen(getKontostand());
         double dispoInEUR = getAktuelleWaehrung().waehrungInEuroUmrechnen(getDispo());
 
         /** rechne den umgerechneten Kontostand in die gewünschte neue Währung um und setze als Kontostand/Dispo */
-        setKontostand(neu.euroInWaehrungUmrechnen(kontostandInEUR));
         setDispo(neu.euroInWaehrungUmrechnen(dispoInEUR));
 
         /** setze Währung auf neue um */

@@ -21,8 +21,10 @@ public abstract class Konto implements Comparable<Konto> {
      */
     private double kontostand;
 
-    /** die aktuelle Währung */
-    private Waehrung waehrung;
+    /**
+     * die aktuelle Währung
+     */
+    private Waehrung waehrung = Waehrung.EUR;
 
     /**
      * setzt den aktuellen Kontostand
@@ -47,13 +49,12 @@ public abstract class Konto implements Comparable<Konto> {
      * @param kontonummer die gewünschte Kontonummer
      * @throws IllegalArgumentException wenn der inhaber null ist
      */
-    public Konto(Kunde inhaber, long kontonummer, Waehrung waehrung) {
+    public Konto(Kunde inhaber, long kontonummer) {
         if (inhaber == null)
             throw new IllegalArgumentException("Inhaber darf nicht null sein!");
         this.inhaber = inhaber;
         this.nummer = kontonummer;
         this.kontostand = 0;
-        this.waehrung = waehrung;
         this.gesperrt = false;
     }
 
@@ -61,7 +62,7 @@ public abstract class Konto implements Comparable<Konto> {
      * setzt alle Eigenschaften des Kontos auf Standardwerte
      */
     public Konto() {
-        this(Kunde.MUSTERMANN, 1234567, Waehrung.EUR);
+        this(Kunde.MUSTERMANN, 1234567);
     }
 
     /**
@@ -257,8 +258,12 @@ public abstract class Konto implements Comparable<Konto> {
      * @throws GesperrtException        wenn das Konto gesperrt ist
      * @throws IllegalArgumentException wenn der Betrag negativ oder unendlich oder NaN ist
      */
-    public abstract boolean abheben(double betrag, Waehrung waehrung)
-            throws GesperrtException;
+    public boolean abheben(double betrag, Waehrung waehrung) throws GesperrtException {
+        double betragInEUR = waehrung.waehrungInEuroUmrechnen(betrag);
+        double betragInKontoWaehrung = getAktuelleWaehrung().euroInWaehrungUmrechnen(betragInEUR);
+
+        return abheben(betragInKontoWaehrung);
+    }
 
     /**
      * Ruft die aktuelle Währung ab, die mit diesem Konto verbunden ist.
@@ -275,6 +280,9 @@ public abstract class Konto implements Comparable<Konto> {
      * @param neu die neue Währung, die mit dem Konto verknüpft werden soll
      */
     public void waehrungswechsel(Waehrung neu) {
+        double kontostandInEUR = getAktuelleWaehrung().waehrungInEuroUmrechnen(getKontostand());
+        setKontostand(neu.euroInWaehrungUmrechnen(kontostandInEUR));
+
         this.waehrung = neu;
     }
 

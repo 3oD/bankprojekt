@@ -50,7 +50,7 @@ public class Sparbuch extends Konto {
      * @throws IllegalArgumentException wenn inhaber null ist
      */
     public Sparbuch(Kunde inhaber, long kontonummer) {
-        super(inhaber, kontonummer, Waehrung.EUR);
+        super(inhaber, kontonummer);
         zinssatz = 0.03;
     }
 
@@ -86,15 +86,6 @@ public class Sparbuch extends Konto {
             return false;
     }
 
-    @Override
-    public boolean abheben(double betrag, Waehrung waehrung) throws GesperrtException {
-        double betragInEUR = waehrung.waehrungInEuroUmrechnen(betrag);
-        double betragInKontoWaehrung = getAktuelleWaehrung().euroInWaehrungUmrechnen(betragInEUR);
-
-        return abheben(betragInKontoWaehrung);
-    }
-
-
     /**
      * Konvertiert den Kontostand und den bereits abgehobenen Betrag in die neue Währung.
      * Ändert die Kontowährung in die neue Währung.
@@ -103,10 +94,7 @@ public class Sparbuch extends Konto {
      */
     @Override
     public void waehrungswechsel(Waehrung neu) {
-        double kontostandInEUR = getAktuelleWaehrung().waehrungInEuroUmrechnen(getKontostand());
         double bereitsAbgehobenInEUR = getAktuelleWaehrung().waehrungInEuroUmrechnen(bereitsAbgehoben);
-
-        setKontostand(neu.euroInWaehrungUmrechnen(kontostandInEUR));
         bereitsAbgehoben = neu.euroInWaehrungUmrechnen(bereitsAbgehobenInEUR);
 
         super.waehrungswechsel(neu);
