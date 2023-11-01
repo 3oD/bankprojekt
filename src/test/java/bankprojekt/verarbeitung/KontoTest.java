@@ -26,11 +26,19 @@ public class KontoTest {
     }
 
     @Test
-    public void testWaehrungswechsel() {
+    public void testWaehrungswechsel() throws GesperrtException {
         girokonto.waehrungswechsel(Waehrung.BGN);
-        assertEquals(1955.79, girokonto.getKontostand());
+        assertEquals(1955.8, girokonto.getKontostand(),0.01);
+        assertEquals(1955.8,girokonto.getDispo(),0.01);
+        girokonto.waehrungswechsel(Waehrung.EUR);
+        assertEquals(1000, girokonto.getKontostand(),0.01);
+        assertEquals(1000, girokonto.getDispo(),0.01);
+
+        sparbuch.abheben(200);
+        double betragNachWechsel = Waehrung.DKK.euroInWaehrungUmrechnen(200);
         sparbuch.waehrungswechsel(Waehrung.DKK);
-        assertEquals(7460.39, sparbuch.getKontostand());
+        assertEquals(5968.3, sparbuch.getKontostand(),0.02);
+        assertEquals(betragNachWechsel, sparbuch.getBereitsAbgehoben());
     }
 
     @Test
@@ -65,16 +73,31 @@ public class KontoTest {
 
     @Test
     public void testAbheben() throws GesperrtException {
-        assertTrue(girokonto.abheben(200));
-        assertFalse(girokonto.abheben(5000));
+        assertTrue(girokonto.abheben(200, Waehrung.DKK));
+        assertFalse(girokonto.abheben(5000000, Waehrung.MKD));
 
-        assertTrue(sparbuch.abheben(13));
-        assertFalse(sparbuch.abheben(2001));
+        assertTrue(sparbuch.abheben(13, Waehrung.DKK));
+        assertFalse(sparbuch.abheben(2001, Waehrung.BGN));
+    }
+
+    @Test
+    public void testAbhebenMitFremdwaehrung() throws GesperrtException {
+        girokonto.waehrungswechsel(Waehrung.DKK);
+        assertTrue(girokonto.abheben(200, Waehrung.DKK));
+        assertTrue(girokonto.abheben(20,Waehrung.EUR));
+        assertTrue(girokonto.abheben(20,Waehrung.BGN));
+        assertFalse(girokonto.abheben(5000000, Waehrung.MKD));
+
+        sparbuch.waehrungswechsel(Waehrung.DKK);
+        assertTrue(sparbuch.abheben(13, Waehrung.DKK));
+        assertTrue(sparbuch.abheben(20,Waehrung.EUR));
+        assertTrue(sparbuch.abheben(20,Waehrung.BGN));
+        assertFalse(sparbuch.abheben(2001, Waehrung.BGN));
     }
 
     @Test
     public void testAbhebenGirokontoZuViel() throws GesperrtException {
-        assertFalse(girokonto.abheben(5000));
+        assertFalse(girokonto.abheben(5000000, Waehrung.DKK));
     }
 
     @Test

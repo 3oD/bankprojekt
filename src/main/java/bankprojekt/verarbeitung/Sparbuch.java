@@ -54,6 +54,15 @@ public class Sparbuch extends Konto {
         zinssatz = 0.03;
     }
 
+    /**
+     * Gibt den Geldbetrag zurück, der bereits von dem Konto abgehoben wurde.
+     *
+     * @return der Geldbetrag, der bereits abgehoben wurde
+     */
+    public double getBereitsAbgehoben() {
+        return bereitsAbgehoben;
+    }
+
     @Override
     public String toString() {
         String ausgabe = "-- SPARBUCH --" + System.lineSeparator() +
