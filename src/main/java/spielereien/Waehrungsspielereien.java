@@ -3,7 +3,6 @@ package spielereien;
 import java.time.LocalDate;
 
 import bankprojekt.verarbeitung.*;
-//import bankprojekt.verarbeitung.Waehrung;
 
 /**
  * spielt ein wenig mit den Währungsmethoden des Bankprojektes herum

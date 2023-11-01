@@ -1,6 +1,10 @@
-package bankprojekt.verarbeitung;
+package bankprojekt.verwaltung;
 
-import bankprojekt.verwaltung.Bank;
+import bankprojekt.verarbeitung.GesperrtException;
+import bankprojekt.verarbeitung.Girokonto;
+import bankprojekt.verarbeitung.Kunde;
+import bankprojekt.verarbeitung.Sparbuch;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -56,5 +60,12 @@ class BankTest {
         System.out.println("------------------------------");
         System.out.println("Konto " + b.getAlleKontonummern().get(0) + " wurde erfolgreich gelöscht");
         System.out.println("------------------------------");
+    }
+
+    @Test
+    void testKontoNichtVorhanden(){
+        Assertions.assertThrowsExactly(KontonummerNichtVorhandenException.class, ()->{
+           b.geldEinzahlen(156846L,33.6);
+        });
     }
 }

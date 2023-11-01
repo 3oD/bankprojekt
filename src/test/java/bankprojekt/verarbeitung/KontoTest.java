@@ -26,6 +26,13 @@ public class KontoTest {
     }
 
     @Test
+    void testWerbetext(){
+        assertEquals("ganz hoher Dispo", Kontoart.GIROKONTO.getWerbetext());
+        assertEquals("ganz vioele Zinsen", Kontoart.SPARBUCH.getWerbetext());
+        assertEquals("kommt später...", Kontoart.FESTGELDKONTO.getWerbetext());
+    }
+
+    @Test
     public void testWaehrungswechsel() throws GesperrtException {
         girokonto.waehrungswechsel(Waehrung.BGN);
         assertEquals(1955.8, girokonto.getKontostand(),0.01);
