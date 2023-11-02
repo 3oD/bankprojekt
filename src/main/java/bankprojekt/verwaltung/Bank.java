@@ -16,6 +16,7 @@ public class Bank {
 
     /**
      * Represents a bank with a given bank code (Bankleitzahl).
+     *
      * @param bankleitzahl bank code to be given
      */
     public Bank(long bankleitzahl) {
@@ -128,7 +129,7 @@ public class Bank {
      * @param nummer the account number to validate
      * @param betrag the amount to validate
      * @throws KontonummerNichtVorhandenException if the account number does not exist
-     * @throws IllegalArgumentException if the amount is less than or equal to zero
+     * @throws IllegalArgumentException           if the amount is less than or equal to zero
      */
     private void validiereKontoUndBetrag(long nummer, double betrag) throws KontonummerNichtVorhandenException {
         if (!kontoMap.containsKey(nummer)) {
@@ -146,7 +147,7 @@ public class Bank {
      * @param betrag the amount of money to withdraw
      * @return true if the withdrawal was successful, false otherwise
      * @throws KontonummerNichtVorhandenException if the account number does not exist
-     * @throws GesperrtException if the account is locked and the withdrawal is not allowed
+     * @throws GesperrtException                  if the account is locked and the withdrawal is not allowed
      */
     public boolean geldAbheben(long nummer, double betrag) throws KontonummerNichtVorhandenException, GesperrtException {
         validiereKontoUndBetrag(nummer, betrag);
@@ -192,15 +193,44 @@ public class Bank {
     /**
      * Transfers money from one account to another.
      *
-     * @param vonKontonr the account number to transfer money from
-     * @param nachKontonr the account number to transfer money to
-     * @param betrag the amount of money to transfer
+     * @param vonKontonr       the account number to transfer money from
+     * @param nachKontonr      the account number to transfer money to
+     * @param betrag           the amount of money to transfer
      * @param verwendungszweck the purpose of the transfer
-     *
      * @return true if the money transfer was successful, false otherwise
      */
     public boolean geldUeberweisen(long vonKontonr, long nachKontonr, double betrag, String verwendungszweck) {
-        //TODO: Implementieren
+        Konto sender = kontoMap.get(vonKontonr);
+        Konto empfaenger = kontoMap.get(nachKontonr);
+
+        if (sender == null || empfaenger == null) {
+            return false;
+        }
+
+        if (sender.getKontostand() < betrag) {
+            return false;
+        }
+
+        if (sender instanceof Ueberweisungsfaehig ueberweisungsfaehigSender && empfaenger instanceof Ueberweisungsfaehig ueberweisungsfaehigEmpfaenger){
+            sendeUeberweisung(ueberweisungsfaehigSender, betrag, empfaenger.getInhaber().getName(), empfaenger.getKontonummer(), getBankleitzahl(), verwendungszweck);
+            empfangeUeberweisung(ueberweisungsfaehigEmpfaenger, betrag, sender.getInhaber().getName(), sender.getKontonummer(), getBankleitzahl(), verwendungszweck);
+
+            return true;
+        }
         return false;
+    }
+
+    private boolean sendeUeberweisung(Ueberweisungsfaehig sender, double betrag, String empfaenger,
+                                      long nachKontonr, long nachBlz, String verwendungszweck) {
+        try {
+            return sender.ueberweisungAbsenden(betrag, empfaenger, nachKontonr, nachBlz, verwendungszweck);
+        } catch (GesperrtException e) {
+            return false;
+        }
+    }
+
+    private void empfangeUeberweisung(Ueberweisungsfaehig empfaenger, double betrag, String vonName,
+                                      long vonKontonr, long vonBlz, String verwendungszweck) {
+        empfaenger.ueberweisungEmpfangen(betrag, vonName, vonKontonr, vonBlz, verwendungszweck);
     }
 }
