@@ -42,7 +42,7 @@ public class Bank {
         kontonummer = Math.abs(10000000L + zahlengenerator.nextLong(90000000));
 
         if (kontoMap.containsKey(kontonummer)) {
-            generiereEindeutigeKontonummer();
+            return generiereEindeutigeKontonummer();
         }
         return kontonummer;
     }

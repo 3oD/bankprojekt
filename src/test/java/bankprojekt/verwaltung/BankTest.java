@@ -11,11 +11,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class BankTest {
     Bank b = new Bank(12312L);
+    Bank b2 = new Bank(145351L);
     Kunde[] kundenArray = {
             new Kunde("Max", "Mustermann", "Home", LocalDate.parse("2001-10-29")),
             new Kunde("John", "Doe", "Work", LocalDate.parse("1985-07-12")),
@@ -46,6 +50,11 @@ class BankTest {
     }
 
     @Test
+    void testGetBankleitzahl(){
+        assertEquals(12312L, b.getBankleitzahl());
+    }
+
+    @Test
     void brutTest() throws GesperrtException, KontonummerNichtVorhandenException {
         for (Kunde kunde : kundenArray) {
             b.girokontoErstellen(kunde);
@@ -62,6 +71,38 @@ class BankTest {
     }
 
     @Test
+    void testGeldEinzahlen() throws KontonummerNichtVorhandenException {
+        long kontonummer = b.getAlleKontonummern().get(4);
+        b.geldEinzahlen(kontonummer, 500);
+
+        assertEquals(500, b.getKontostand(kontonummer));
+    }
+
+    @Test
+    void testGeldEinzahlenKontonummerNichtVorhanden() {
+        Assertions.assertThrowsExactly(KontonummerNichtVorhandenException.class, () -> {
+            b.geldEinzahlen(8521464L, 500);
+        });
+    }
+
+    @Test
+    void testGeldEinzahlenMitBetrag0() {
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
+            long kontonummer = b.getAlleKontonummern().get(4);
+            b.geldEinzahlen(kontonummer, 0);
+        });
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
+            long kontonummer = b.getAlleKontonummern().get(4);
+            b.geldEinzahlen(kontonummer, -5);
+        });
+    }
+
+    @Test
+    void testGeldAbheben(){
+
+    }
+
+    @Test
     void testKontoLoeschen() {
         long kontonummer = b.getAlleKontonummern().get(0);
         b.kontoLoeschen(kontonummer);
@@ -69,6 +110,11 @@ class BankTest {
         System.out.println("------------------------------");
         System.out.println("Konto " + b.getAlleKontonummern().get(0) + " wurde erfolgreich gelöscht");
         System.out.println("------------------------------");
+    }
+
+    @Test
+    void testKontoLoeschenNichtVorhanden() {
+        assertFalse(b.kontoLoeschen(1891561L));
     }
 
     @Test

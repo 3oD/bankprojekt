@@ -33,9 +33,7 @@ public class Girokonto extends Konto implements Ueberweisungsfaehig {
      */
     public Girokonto(Kunde inhaber, long nummer, double dispo) {
         super(inhaber, nummer);
-        if (dispo < 0 || Double.isNaN(dispo) || Double.isInfinite(dispo))
-            throw new IllegalArgumentException("Der Dispo ist nicht gültig!");
-        this.dispo = dispo;
+        setDispo(dispo);
     }
 
     /**
