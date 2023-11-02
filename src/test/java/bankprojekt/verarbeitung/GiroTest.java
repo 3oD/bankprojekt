@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class GiroTest {
     Girokonto girokonto1, girokonto2;
     Kunde kunde;
@@ -27,6 +29,7 @@ public class GiroTest {
 
     @Test
     void testSetDispo(){
-
+        girokonto1.setDispo(200);
+        assertEquals(200, girokonto1.getDispo());
     }
 }
