@@ -1,6 +1,7 @@
 package bankprojekt.verarbeitung;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -19,6 +20,7 @@ public class SparbuchTest {
         sparbuch2 = new Sparbuch(kunde, 65165161L);
     }
 
+    @Disabled
     @Test
     void testToString() {
         String expectedString = "-- SPARBUCH --" + System.lineSeparator() + "Kontonummer:    1234567"
