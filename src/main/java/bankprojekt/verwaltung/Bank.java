@@ -207,10 +207,6 @@ public class Bank {
             return false;
         }
 
-        if (sender.getKontostand() < betrag) {
-            return false;
-        }
-
         if (sender instanceof Ueberweisungsfaehig ueberweisungsfaehigSender && empfaenger instanceof Ueberweisungsfaehig ueberweisungsfaehigEmpfaenger){
             sendeUeberweisung(ueberweisungsfaehigSender, betrag, empfaenger.getInhaber().getName(), empfaenger.getKontonummer(), getBankleitzahl(), verwendungszweck);
             empfangeUeberweisung(ueberweisungsfaehigEmpfaenger, betrag, sender.getInhaber().getName(), sender.getKontonummer(), getBankleitzahl(), verwendungszweck);
