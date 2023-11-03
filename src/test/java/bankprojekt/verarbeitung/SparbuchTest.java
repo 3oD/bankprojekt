@@ -27,7 +27,8 @@ class SparbuchTest {
 
         String expectedString = "-- SPARBUCH --" + System.lineSeparator() + "Kontonummer:    1234567"
                 + System.lineSeparator() + "Inhaber: Max Mustermann" + System.lineSeparator() + "zuhause"
-                + System.lineSeparator() + df.format(LocalDate.now()) + System.lineSeparator() + "Aktueller Kontostand:       0,00 EUR "
+                + System.lineSeparator() + df.format(LocalDate.now()) + System.lineSeparator() + "Aktueller Kontostand: "
+                + String.format("%10.2f %s", sparbuch1.getKontostand(), sparbuch1.getAktuelleWaehrung()) + " "
                 + System.lineSeparator() + "Zinssatz: 3.0%" + System.lineSeparator();
 
         assertEquals(expectedString, sparbuch1.toString());
