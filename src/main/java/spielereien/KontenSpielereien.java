@@ -30,7 +30,6 @@ public class KontenSpielereien {
 		Kunde ich = new Kunde("Dorothea", "Hubrich", "zuhause", LocalDate.parse("1976-07-13"));
 
 		Girokonto meinGiro = new Girokonto(ich, 1234, 1000.0);
-		//meinGiro.einzahlen(50);
 		System.out.println(meinGiro);
 
 		Sparbuch meinSpar = new Sparbuch(ich, 9876);
@@ -50,8 +49,8 @@ public class KontenSpielereien {
 		System.out.println(meins.toString());
 			//--> Objekt entscheidet, nicht die Variable
 		System.out.println("...........................");
-		//meins.ausgeben();
-			//--> Objekt entscheidet, nicht die Variable
+			// meins ausgeben
+			//→ Objekt entscheidet, nicht die Variable
 		System.out.println("...........................");
 	}
 
