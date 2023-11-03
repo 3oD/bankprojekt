@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 
-public class KontoTest {
+class KontoTest {
     Girokonto girokonto;
     Sparbuch sparbuch;
     Kunde kunde;
@@ -26,60 +26,52 @@ public class KontoTest {
     }
 
     @Test
-    void testWerbetext(){
+    void testWerbetext() {
         assertEquals("ganz hoher Dispo", Kontoart.GIROKONTO.getWerbetext());
         assertEquals("ganz vioele Zinsen", Kontoart.SPARBUCH.getWerbetext());
         assertEquals("kommt später...", Kontoart.FESTGELDKONTO.getWerbetext());
     }
 
     @Test
-    public void testWaehrungswechsel() throws GesperrtException {
+    void testWaehrungswechsel() throws GesperrtException {
+        double expectedKontostand = girokonto.getKontostand();
+        double expectedDispo = girokonto.getDispo();
+        System.out.println(expectedKontostand);
+
         girokonto.waehrungswechsel(Waehrung.BGN);
-        assertEquals(1955.8, girokonto.getKontostand(),0.01);
-        assertEquals(1955.8,girokonto.getDispo(),0.01);
-        girokonto.waehrungswechsel(Waehrung.EUR);
-        assertEquals(1000, girokonto.getKontostand(),0.01);
-        assertEquals(1000, girokonto.getDispo(),0.01);
+        assertEquals(expectedKontostand * 1.9558, girokonto.getKontostand(), 0.01);
+        assertEquals(expectedDispo * 1.9558, girokonto.getDispo(), 0.01);
+        girokonto.waehrungswechsel(Waehrung.MKD);
+        assertEquals(expectedKontostand * 61.62, girokonto.getKontostand(), 0.7);
+        assertEquals(expectedDispo * 61.62, girokonto.getDispo(), 0.7);
 
         sparbuch.abheben(200);
         double betragNachWechsel = Waehrung.DKK.euroInWaehrungUmrechnen(200);
         sparbuch.waehrungswechsel(Waehrung.DKK);
-        assertEquals(5968.3, sparbuch.getKontostand(),0.02);
+        assertEquals(5968.3, sparbuch.getKontostand(), 0.02);
         assertEquals(betragNachWechsel, sparbuch.getBereitsAbgehoben());
     }
 
     @Test
-    public void testEuroInWaehrungUmrechnen() {
-        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
-            waehrungEUR.euroInWaehrungUmrechnen(-156);
-        });
+    void testEuroInWaehrungUmrechnen() {
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> waehrungEUR.euroInWaehrungUmrechnen(-156));
 
-        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
-            waehrungEUR.euroInWaehrungUmrechnen(Double.POSITIVE_INFINITY);
-        });
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> waehrungEUR.euroInWaehrungUmrechnen(Double.POSITIVE_INFINITY));
 
-        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
-            waehrungEUR.euroInWaehrungUmrechnen(Double.NaN);
-        });
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> waehrungEUR.euroInWaehrungUmrechnen(Double.NaN));
     }
 
     @Test
-    public void testWaehrungInEuroUmrechnen() {
-        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
-            waehrungEUR.waehrungInEuroUmrechnen(-156);
-        });
+    void testWaehrungInEuroUmrechnen() {
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> waehrungEUR.waehrungInEuroUmrechnen(-156));
 
-        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
-            waehrungEUR.waehrungInEuroUmrechnen(Double.POSITIVE_INFINITY);
-        });
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> waehrungEUR.waehrungInEuroUmrechnen(Double.POSITIVE_INFINITY));
 
-        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
-            waehrungEUR.waehrungInEuroUmrechnen(Double.NaN);
-        });
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> waehrungEUR.waehrungInEuroUmrechnen(Double.NaN));
     }
 
     @Test
-    public void testAbheben() throws GesperrtException {
+    void testAbheben() throws GesperrtException {
         assertTrue(girokonto.abheben(200, Waehrung.DKK));
         assertFalse(girokonto.abheben(5000000, Waehrung.MKD));
 
@@ -88,61 +80,53 @@ public class KontoTest {
     }
 
     @Test
-    public void testAbhebenMitFremdwaehrung() throws GesperrtException {
+    void testAbhebenMitFremdwaehrung() throws GesperrtException {
         girokonto.waehrungswechsel(Waehrung.DKK);
         assertTrue(girokonto.abheben(200, Waehrung.DKK));
-        assertTrue(girokonto.abheben(20,Waehrung.EUR));
-        assertTrue(girokonto.abheben(20,Waehrung.BGN));
+        assertTrue(girokonto.abheben(20, Waehrung.EUR));
+        assertTrue(girokonto.abheben(20, Waehrung.BGN));
         assertFalse(girokonto.abheben(5000000, Waehrung.MKD));
 
         sparbuch.waehrungswechsel(Waehrung.DKK);
         assertTrue(sparbuch.abheben(13, Waehrung.DKK));
-        assertTrue(sparbuch.abheben(20,Waehrung.EUR));
-        assertTrue(sparbuch.abheben(20,Waehrung.BGN));
+        assertTrue(sparbuch.abheben(20, Waehrung.EUR));
+        assertTrue(sparbuch.abheben(20, Waehrung.BGN));
         assertFalse(sparbuch.abheben(2001, Waehrung.BGN));
     }
 
     @Test
-    public void testAbhebenGirokontoZuViel() throws GesperrtException {
+    void testAbhebenGirokontoZuViel() throws GesperrtException {
         assertFalse(girokonto.abheben(5000000, Waehrung.DKK));
     }
 
     @Test
-    public void testAbhebenSparbuchZuViel() throws GesperrtException {
+    void testAbhebenSparbuchZuViel() throws GesperrtException {
         assertFalse(sparbuch.abheben(2051));
     }
 
     @Test
-    public void testAbhebenSparbuchBetragUngueltig() throws GesperrtException {
-        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
-            assertFalse(sparbuch.abheben(Double.NaN));
-        });
-        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
-            assertFalse(sparbuch.abheben(Double.POSITIVE_INFINITY));
-        });
-        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
-            assertFalse(sparbuch.abheben(-189));
-        });
+    void testAbhebenSparbuchBetragUngueltig() {
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> assertFalse(sparbuch.abheben(Double.NaN)));
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> assertFalse(sparbuch.abheben(Double.POSITIVE_INFINITY)));
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> assertFalse(sparbuch.abheben(-189)));
     }
 
     @Test
-    public void testAbhebenSparbuchGesperrt() {
+    void testAbhebenSparbuchGesperrt() {
         sparbuch.sperren();
-        Assertions.assertThrowsExactly(GesperrtException.class, () -> {
-           sparbuch.abheben(15);
-        });
+        Assertions.assertThrowsExactly(GesperrtException.class, () -> sparbuch.abheben(15));
     }
 
     @Test
-    public void testAbhebenSparbuchInAndererWaehrung() throws GesperrtException {
+    void testAbhebenSparbuchInAndererWaehrung() throws GesperrtException {
         sparbuch.waehrungswechsel(waehrungMKD);
         assertFalse(sparbuch.abheben(88136513, waehrungEUR));
         assertTrue(sparbuch.abheben(12, waehrungEUR));
     }
 
     @Test
-    public void testAbhebenInFremdwaehrung() throws GesperrtException {
+    void testAbhebenInFremdwaehrung() throws GesperrtException {
         assertTrue(girokonto.abheben(200, waehrungMKD));
-        assertTrue(sparbuch.abheben(15,waehrungMKD));
+        assertTrue(sparbuch.abheben(15, waehrungMKD));
     }
 }
