@@ -224,9 +224,10 @@ public class Bank {
                 empfangeUeberweisung(ueberweisungsfaehigEmpfaenger,
                         betrag, sender.getInhaber().getName(),
                         sender.getKontonummer(), getBankleitzahl(), verwendungszweck);
+                return true;
             }
 
-            return true;
+            return false;
         }
         return false;
     }

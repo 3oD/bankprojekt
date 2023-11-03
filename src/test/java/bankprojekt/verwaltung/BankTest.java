@@ -35,8 +35,8 @@ class BankTest {
         assertEquals(12312L, b1.getBankleitzahl());
     }
 
-    // TODO: Eigener Test für getAlleKonten
     // TODO: Eigener Test für getAlleKontonummern
+    // TODO: Test getKontostand inkl. Exception
 
     @Test
     void testGeldEinzahlen() throws KontonummerNichtVorhandenException {
