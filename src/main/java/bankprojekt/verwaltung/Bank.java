@@ -2,7 +2,6 @@ package bankprojekt.verwaltung;
 
 import bankprojekt.verarbeitung.*;
 
-import java.security.SecureRandom;
 import java.util.*;
 
 /**
@@ -12,7 +11,7 @@ import java.util.*;
 public class Bank {
     private final long bankleitzahl;
     private final Map<Long, Konto> kontoMap = new HashMap<>();
-    private final SecureRandom zahlengenerator = new SecureRandom();
+    private static long kontonummerZaehler = 10000000L;
     private static final double STANDARD_DISPO = 1000;
 
     /**
@@ -37,11 +36,10 @@ public class Bank {
      * @return the generated unique account number
      */
     private synchronized long generiereEindeutigeKontonummer() {
-        long kontonummer;
-        kontonummer = Math.abs(10000000L + zahlengenerator.nextLong(90000000));
+        long kontonummer = kontonummerZaehler++;
 
-        if (kontoMap.containsKey(kontonummer)) {
-            return generiereEindeutigeKontonummer();
+        while(kontoMap.containsKey(kontonummer)){
+            kontonummerZaehler++;
         }
         return kontonummer;
     }
@@ -123,18 +121,27 @@ public class Bank {
     }
 
     /**
-     * Validates the account number and amount for a transaction.
+     * Validates a bank account with the given account number.
      *
-     * @param nummer the account number to validate
-     * @param betrag the amount to validate
+     * @param nummer the account number to be validated
      * @throws KontonummerNichtVorhandenException if the account number does not exist
-     * @throws IllegalArgumentException if the amount is less than or equal to zero
+     * @throws IllegalArgumentException if the account number is invalid
      */
-    private void validiereKontoUndBetrag(long nummer, double betrag) throws KontonummerNichtVorhandenException, IllegalArgumentException {
+    private void validiereKonto(long nummer) throws KontonummerNichtVorhandenException {
         if (!kontoMap.containsKey(nummer)) {
             throw new KontonummerNichtVorhandenException(nummer);
         }
-        if (betrag <= 0) {
+    }
+
+    /**
+     * Validates the given amount.
+     *
+     * @param betrag the amount to be validated
+     * @throws IllegalArgumentException if the amount is less than or equal to 0, NaN, or infinite
+     */
+    private void validiereBetrag(double betrag){
+
+        if (betrag <= 0 || Double.isNaN(betrag) || Double.isInfinite(betrag)) {
             throw new IllegalArgumentException("Der Betrag muss größer als 0 sein.");
         }
     }
@@ -149,7 +156,8 @@ public class Bank {
      * @throws GesperrtException if the account is locked
      */
     public boolean geldAbheben(long nummer, double betrag) throws KontonummerNichtVorhandenException, GesperrtException {
-        validiereKontoUndBetrag(nummer, betrag);
+        validiereKonto(nummer);
+        validiereBetrag(betrag);
         return kontoMap.get(nummer).abheben(betrag);
     }
 
@@ -161,7 +169,8 @@ public class Bank {
      * @throws KontonummerNichtVorhandenException if the account number does not exist
      */
     public void geldEinzahlen(long auf, double betrag) throws KontonummerNichtVorhandenException {
-        validiereKontoUndBetrag(auf, betrag);
+        validiereKonto(auf);
+        validiereBetrag(betrag);
         kontoMap.get(auf).einzahlen(betrag);
     }
 

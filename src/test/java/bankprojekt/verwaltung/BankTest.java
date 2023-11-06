@@ -60,6 +60,10 @@ class BankTest {
     void testGeldAbheben() throws GesperrtException, KontonummerNichtVorhandenException {
         assertTrue(b1.geldAbheben(kontoNummer1, 100));
         assertEquals(400, b1.getKontostand(kontoNummer1));
+        assertTrue(b1.geldAbheben(kontoNummer2, 100));
+        assertTrue(b1.geldAbheben(kontoNummer2, 700));
+        assertTrue(b1.geldAbheben(kontoNummer2, 200));
+        assertFalse(b1.geldAbheben(kontoNummer2, 1));
     }
 
     @Test
