@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class GiroTest {
+class GiroTest {
     Girokonto girokonto1, girokonto2;
     Kunde kunde;
 
@@ -17,18 +17,18 @@ public class GiroTest {
         kunde = new Kunde("Sebastian", "Gey", "hier", LocalDate.parse("1996-09-15"));
 
         girokonto1 = new Girokonto();
-        girokonto2 = new Girokonto(kunde, 65165161L,1000);
+        girokonto2 = new Girokonto(kunde, 65165161L, 1000);
     }
 
     @Test
-    void testConstructorUngueltigerDispo(){
-        Assertions.assertThrowsExactly(IllegalArgumentException.class, ()->{
-           Girokonto girokonto = new Girokonto(kunde, 6546546L,-156);
+    void testConstructorUngueltigerDispo() {
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
+            Girokonto girokonto = new Girokonto(kunde, 6546546L, -156);
         });
     }
 
     @Test
-    void testSetDispo(){
+    void testSetDispo() {
         girokonto1.setDispo(200);
         assertEquals(200, girokonto1.getDispo());
     }

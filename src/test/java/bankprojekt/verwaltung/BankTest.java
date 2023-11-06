@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class BankTest {
     Bank b1, b2;
     Kunde kunde1, kunde2;
-    long kontoNummer1, kontoNummer2;
+    long kontoNummer1, kontoNummer2, kontoNummer3;
 
     @BeforeEach
     void setup() throws KontonummerNichtVorhandenException {
@@ -25,6 +25,7 @@ class BankTest {
 
         kontoNummer1 = b1.girokontoErstellen(kunde1);
         kontoNummer2 = b1.girokontoErstellen(kunde2);
+        kontoNummer3 = b1.sparbuchErstellen(kunde1);
 
         b1.geldEinzahlen(kontoNummer1, 500);
     }
@@ -34,8 +35,8 @@ class BankTest {
         assertEquals(12312L, b1.getBankleitzahl());
     }
 
-    // TODO: Eigener Test für getAlleKonten
     // TODO: Eigener Test für getAlleKontonummern
+    // TODO: Test getKontostand inkl. Exception
 
     @Test
     void testGeldEinzahlen() throws KontonummerNichtVorhandenException {
@@ -57,7 +58,7 @@ class BankTest {
 
     @Test
     void testGeldAbheben() throws GesperrtException, KontonummerNichtVorhandenException {
-        b1.geldAbheben(kontoNummer1, 100);
+        assertTrue(b1.geldAbheben(kontoNummer1, 100));
         assertEquals(400, b1.getKontostand(kontoNummer1));
     }
 
@@ -82,9 +83,37 @@ class BankTest {
     }
 
     @Test
-    void testGeldueberweisen() {
+    void testGeldUeberweisen() throws KontonummerNichtVorhandenException {
         b1.geldUeberweisen(kontoNummer1, kontoNummer2, 100, "Test");
         assertEquals(100, b1.getKontostand(kontoNummer2));
         assertEquals(400, b1.getKontostand(kontoNummer1));
+    }
+
+    @Test
+    void testGeldUeberweisenSenderOderEmpfaengerNichtVorhanden() {
+        assertFalse(b1.geldUeberweisen(15461L, kontoNummer1, 800, "Test"));
+        assertFalse(b1.geldUeberweisen(kontoNummer1, 1218651L, 800, "Test"));
+    }
+
+    @Test
+    void testGeldUeberweisenNichtUeberweisungsfaehig() {
+        assertFalse(b1.geldUeberweisen(kontoNummer3, kontoNummer1, 500, "Test"));
+        assertFalse(b1.geldUeberweisen(kontoNummer1, kontoNummer3, 500, "Test"));
+    }
+
+    @Test
+    void testGeldUeberweisenKeinVerwendungszweck() {
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> b1.geldUeberweisen(kontoNummer3, kontoNummer1, 500, " "));
+    }
+
+    @Test
+    void testGetAlleKonten() throws KontonummerNichtVorhandenException {
+        String exprectedString = "------------------------------" + System.lineSeparator() +
+                "Liste aller Konten:" + System.lineSeparator() +
+                "Kontonummer: " + b1.getAlleKontonummern().get(0) + ", Kontostand: " + b1.getKontostand(b1.getAlleKontonummern().get(0)) + " EUR" + System.lineSeparator() +
+                "Kontonummer: " + b1.getAlleKontonummern().get(1) + ", Kontostand: " + b1.getKontostand(b1.getAlleKontonummern().get(1)) + " EUR" + System.lineSeparator() +
+                "Kontonummer: " + b1.getAlleKontonummern().get(2) + ", Kontostand: " + b1.getKontostand(b1.getAlleKontonummern().get(2)) + " EUR" + System.lineSeparator() +
+                "------------------------------";
+        assertEquals(exprectedString, b1.getAlleKonten());
     }
 }

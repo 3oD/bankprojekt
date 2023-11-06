@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -21,9 +23,12 @@ class SparbuchTest {
 
     @Test
     void testToString() {
+        DateTimeFormatter df = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
+
         String expectedString = "-- SPARBUCH --" + System.lineSeparator() + "Kontonummer:    1234567"
                 + System.lineSeparator() + "Inhaber: Max Mustermann" + System.lineSeparator() + "zuhause"
-                + System.lineSeparator() + "03.11.23" + System.lineSeparator() + "Aktueller Kontostand:       0,00 EUR "
+                + System.lineSeparator() + df.format(LocalDate.now()) + System.lineSeparator() + "Aktueller Kontostand: "
+                + String.format("%10.2f %s", sparbuch1.getKontostand(), sparbuch1.getAktuelleWaehrung()) + " "
                 + System.lineSeparator() + "Zinssatz: 3.0%" + System.lineSeparator();
 
         assertEquals(expectedString, sparbuch1.toString());
