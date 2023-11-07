@@ -6,52 +6,49 @@ import bankprojekt.verarbeitung.*;
 
 /**
  * Testprogramm für Konten
- * @author Doro
  *
+ * @author Doro
  */
 public class KontenSpielereien {
 
-	/**
-	 * Testprogramm für Konten
-	 * @param args wird nicht benutzt
-	 */
-	public static void main(String[] args) {
-		String eingabe = "FESTGELDKONTO";
+    /**
+     * Testprogramm für Konten
+     *
+     * @param args wird nicht benutzt
+     */
+    public static void main(String[] args) {
+        String eingabe = "FESTGELDKONTO";
 
-		Kontoart art = Kontoart.valueOf(eingabe);
-		System.out.println(art.name() + " " + art.ordinal() + " " + art.getWerbetext());
+        Kontoart art = Kontoart.valueOf(eingabe);
+        System.out.println(art.name() + " " + art.ordinal() + " " + art.getWerbetext());
 
-		for(Kontoart a: Kontoart.values())
-		{
-			System.out.println(a.name() + ": " + a.getWerbetext());
-		}
+        for (Kontoart a : Kontoart.values()) {
+            System.out.println(a.name() + ": " + a.getWerbetext());
+        }
 
 
-		Kunde ich = new Kunde("Dorothea", "Hubrich", "zuhause", LocalDate.parse("1976-07-13"));
+        Kunde ich = new Kunde("Dorothea", "Hubrich", "zuhause", LocalDate.parse("1976-07-13"));
 
-		Girokonto meinGiro = new Girokonto(ich, 1234, 1000.0);
-		System.out.println(meinGiro);
+        Girokonto meinGiro = new Girokonto(ich, 1234, 1000.0);
+        System.out.println(meinGiro);
 
-		Sparbuch meinSpar = new Sparbuch(ich, 9876);
-		meinSpar.einzahlen(50);
-		try
-		{
-			boolean hatGeklappt = meinSpar.abheben(70);
-			System.out.println("Abhebung hat geklappt: " + hatGeklappt);
-			System.out.println(meinSpar);
-		}
-		catch (GesperrtException e)
-		{
-			System.out.println("Zugriff auf gesperrtes Konto - Polizei rufen!");
-		}
+        Sparbuch meinSpar = new Sparbuch(ich, 9876);
+        meinSpar.einzahlen(50);
+        try {
+            boolean hatGeklappt = meinSpar.abheben(70);
+            System.out.println("Abhebung hat geklappt: " + hatGeklappt);
+            System.out.println(meinSpar);
+        } catch (GesperrtException e) {
+            System.out.println("Zugriff auf gesperrtes Konto - Polizei rufen!");
+        }
 
-		Konto meins = new Girokonto();
-		System.out.println(meins.toString());
-			//--> Objekt entscheidet, nicht die Variable
-		System.out.println("...........................");
-			// meins ausgeben
-			//→ Objekt entscheidet, nicht die Variable
-		System.out.println("...........................");
-	}
+        Konto meins = new Girokonto();
+        System.out.println(meins.toString());
+        //--> Objekt entscheidet, nicht die Variable
+        System.out.println("...........................");
+        // meins ausgeben
+        //→ Objekt entscheidet, nicht die Variable
+        System.out.println("...........................");
+    }
 
 }
