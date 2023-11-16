@@ -10,7 +10,7 @@ import java.util.*;
  */
 public class Bank {
     private final long bankleitzahl;
-    private final Map<Long, Konto> kontoMap = new HashMap<>();
+    private Map<Long, Konto> kontoMap = new HashMap<>();
     private static long kontonummerZaehler = 10000000L;
     private static final double STANDARD_DISPO = 1000;
 
@@ -73,6 +73,11 @@ public class Bank {
      */
     public long sparbuchErstellen(Kunde inhaber) {
         return kontoErstellen(new Sparbuch(inhaber, generiereEindeutigeKontonummer()));
+    }
+
+    public long mockEinfuegen(Konto k) {
+        kontoMap.put(k.getKontonummer(), k);
+        return k.getKontonummer();
     }
 
     /**
@@ -196,9 +201,7 @@ public class Bank {
      * @throws KontonummerNichtVorhandenException if the account number does not exist
      */
     public double getKontostand(long nummer) throws KontonummerNichtVorhandenException {
-        if (!kontoMap.containsKey(nummer)){
-            throw new KontonummerNichtVorhandenException(nummer);
-        }
+        validiereKonto(nummer);
         return kontoMap.get(nummer).getKontostand();
     }
 
@@ -229,6 +232,7 @@ public class Bank {
             boolean ueberweisungErfolgt = sendeUeberweisung(ueberweisungsfaehigSender,
                     betrag, empfaenger.getInhaber().getName(),
                     empfaenger.getKontonummer(), getBankleitzahl(), verwendungszweck);
+
             if (ueberweisungErfolgt) {
                 empfangeUeberweisung(ueberweisungsfaehigEmpfaenger,
                         betrag, sender.getInhaber().getName(),
@@ -252,8 +256,8 @@ public class Bank {
      * @param verwendungszweck the purpose of the money transfer
      * @return true if the money transfer was successfully sent, false otherwise
      */
-    private boolean sendeUeberweisung(Ueberweisungsfaehig sender, double betrag, String empfaenger,
-                                      long nachKontonr, long nachBlz, String verwendungszweck) {
+    boolean sendeUeberweisung(Ueberweisungsfaehig sender, double betrag, String empfaenger,
+                              long nachKontonr, long nachBlz, String verwendungszweck) {
         try {
             return sender.ueberweisungAbsenden(betrag, empfaenger, nachKontonr, nachBlz, verwendungszweck);
         } catch (GesperrtException e) {
