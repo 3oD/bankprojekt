@@ -10,7 +10,7 @@ import java.util.*;
  */
 public class Bank {
     private final long bankleitzahl;
-    private Map<Long, Konto> kontoMap = new HashMap<>();
+    private final Map<Long, Konto> kontoMap = new HashMap<>();
     private static long kontonummerZaehler = 10000000L;
     private static final double STANDARD_DISPO = 1000;
 
@@ -38,7 +38,7 @@ public class Bank {
     private synchronized long generiereEindeutigeKontonummer() {
         long kontonummer = kontonummerZaehler++;
 
-        while(kontoMap.containsKey(kontonummer)){
+        while (kontoMap.containsKey(kontonummer)) {
             kontonummerZaehler++;
         }
         return kontonummer;
@@ -130,7 +130,7 @@ public class Bank {
      *
      * @param nummer the account number to be validated
      * @throws KontonummerNichtVorhandenException if the account number does not exist
-     * @throws IllegalArgumentException if the account number is invalid
+     * @throws IllegalArgumentException           if the account number is invalid
      */
     private void validiereKonto(long nummer) throws KontonummerNichtVorhandenException {
         if (!kontoMap.containsKey(nummer)) {
@@ -144,7 +144,7 @@ public class Bank {
      * @param betrag the amount to be validated
      * @throws IllegalArgumentException if the amount is less than or equal to 0, NaN, or infinite
      */
-    private void validiereBetrag(double betrag){
+    private void validiereBetrag(double betrag) {
 
         if (betrag <= 0 || Double.isNaN(betrag) || Double.isInfinite(betrag)) {
             throw new IllegalArgumentException("Der Betrag muss größer als 0 sein.");
@@ -158,7 +158,7 @@ public class Bank {
      * @param betrag the amount of money to withdraw
      * @return true if the withdrawal was successful, false otherwise
      * @throws KontonummerNichtVorhandenException if the account number does not exist
-     * @throws GesperrtException if the account is locked
+     * @throws GesperrtException                  if the account is locked
      */
     public boolean geldAbheben(long nummer, double betrag) throws KontonummerNichtVorhandenException, GesperrtException {
         validiereKonto(nummer);
@@ -169,7 +169,7 @@ public class Bank {
     /**
      * Deposits the specified amount of money into the account with the given account number.
      *
-     * @param auf the account number to deposit into
+     * @param auf    the account number to deposit into
      * @param betrag the amount of money to deposit
      * @throws KontonummerNichtVorhandenException if the account number does not exist
      */
@@ -208,9 +208,9 @@ public class Bank {
     /**
      * Transfers specified amount of money from one account to another.
      *
-     * @param vonKontonr     the account number to transfer money from
-     * @param nachKontonr    the account number to transfer money to
-     * @param betrag         the amount of money to transfer
+     * @param vonKontonr       the account number to transfer money from
+     * @param nachKontonr      the account number to transfer money to
+     * @param betrag           the amount of money to transfer
      * @param verwendungszweck the purpose of the transfer
      * @return true if the transfer was successful, false otherwise
      */
@@ -222,12 +222,12 @@ public class Bank {
             return false;
         }
 
-        if (verwendungszweck.isBlank()){
+        if (verwendungszweck.isBlank()) {
             throw new IllegalArgumentException("Bitte geben Sie einen Verwendungszweck an!");
         }
 
         if (sender instanceof Ueberweisungsfaehig ueberweisungsfaehigSender &&
-                empfaenger instanceof Ueberweisungsfaehig ueberweisungsfaehigEmpfaenger){
+                empfaenger instanceof Ueberweisungsfaehig ueberweisungsfaehigEmpfaenger) {
 
             boolean ueberweisungErfolgt = sendeUeberweisung(ueberweisungsfaehigSender,
                     betrag, empfaenger.getInhaber().getName(),
@@ -268,12 +268,12 @@ public class Bank {
     /**
      * Receives a money transfer for the specified receiver.
      *
-     * @param empfaenger        the receiver of the money transfer
-     * @param betrag            the amount of money transferred
-     * @param vonName           the name of the sender
-     * @param vonKontonr        the account number of the sender
-     * @param vonBlz            the bank code of the sender's bank
-     * @param verwendungszweck  the purpose of the money transfer
+     * @param empfaenger       the receiver of the money transfer
+     * @param betrag           the amount of money transferred
+     * @param vonName          the name of the sender
+     * @param vonKontonr       the account number of the sender
+     * @param vonBlz           the bank code of the sender's bank
+     * @param verwendungszweck the purpose of the money transfer
      */
     private void empfangeUeberweisung(Ueberweisungsfaehig empfaenger, double betrag, String vonName,
                                       long vonKontonr, long vonBlz, String verwendungszweck) {
