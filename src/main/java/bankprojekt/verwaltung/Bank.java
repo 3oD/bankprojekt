@@ -208,15 +208,16 @@ public class Bank {
     }
 
     /**
-     * Transfers specified amount of money from one account to another.
+     * Transfers the specified amount of money from one account to another.
      *
-     * @param vonKontonr       the account number to transfer money from
-     * @param nachKontonr      the account number to transfer money to
-     * @param betrag           the amount of money to transfer
-     * @param verwendungszweck the purpose of the transfer
-     * @return true if the transfer was successful, false otherwise
+     * @param vonKontonr      the account number for the sender
+     * @param nachKontonr     the account number for the recipient
+     * @param betrag          the amount of money to transfer
+     * @param verwendungszweck the purpose of the money transfer
+     * @return true if the money transfer was successful, false otherwise
+     * @throws IllegalArgumentException if the amount is negative, zero, infinit or NaN, or if the purpose is blank
      */
-    public boolean geldUeberweisen(long vonKontonr, long nachKontonr, double betrag, String verwendungszweck) {
+    public boolean geldUeberweisen(long vonKontonr, long nachKontonr, double betrag, String verwendungszweck) throws IllegalArgumentException {
         Konto sender = kontoMap.get(vonKontonr);
         Konto empfaenger = kontoMap.get(nachKontonr);
 
@@ -224,6 +225,7 @@ public class Bank {
             return false;
         }
 
+        validiereBetrag(betrag);
         if (verwendungszweck.isBlank()) {
             throw new IllegalArgumentException("Bitte geben Sie einen Verwendungszweck an!");
         }
@@ -277,7 +279,7 @@ public class Bank {
      * @param vonBlz           the bank code of the sender's bank
      * @param verwendungszweck the purpose of the money transfer
      */
-    private void empfangeUeberweisung(Ueberweisungsfaehig empfaenger, double betrag, String vonName,
+    void empfangeUeberweisung(Ueberweisungsfaehig empfaenger, double betrag, String vonName,
                                       long vonKontonr, long vonBlz, String verwendungszweck) {
         empfaenger.ueberweisungEmpfangen(betrag, vonName, vonKontonr, vonBlz, verwendungszweck);
     }

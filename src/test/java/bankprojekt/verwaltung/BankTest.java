@@ -54,6 +54,9 @@ class BankTest {
     void testGeldEinzahlenUngueltigerBetrag() {
         Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> b1.geldEinzahlen(kontoNummer2, 0));
         Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> b1.geldEinzahlen(kontoNummer1, -5));
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> b1.geldEinzahlen(kontoNummer1, Double.NaN));
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> b1.geldEinzahlen(kontoNummer1, Double.POSITIVE_INFINITY));
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> b1.geldEinzahlen(kontoNummer1, Double.NEGATIVE_INFINITY));
     }
 
     @Test
@@ -64,6 +67,20 @@ class BankTest {
         assertTrue(b1.geldAbheben(kontoNummer2, 700));
         assertTrue(b1.geldAbheben(kontoNummer2, 200));
         assertFalse(b1.geldAbheben(kontoNummer2, 1));
+    }
+
+    @Test
+    void testGeldAbhebenKontonummerNichtVorhanden() {
+        Assertions.assertThrowsExactly(KontonummerNichtVorhandenException.class, () -> b1.geldAbheben(8521464L, 1000));
+    }
+
+    @Test
+    void testGeldAbhebenUngueltigerBetrag() {
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> b1.geldAbheben(kontoNummer2, 0));
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> b1.geldAbheben(kontoNummer1, -5));
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> b1.geldAbheben(kontoNummer1, Double.NaN));
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> b1.geldAbheben(kontoNummer1, Double.POSITIVE_INFINITY));
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> b1.geldAbheben(kontoNummer1, Double.NEGATIVE_INFINITY));
     }
 
     @Test
