@@ -4,55 +4,86 @@ import bankprojekt.verarbeitung.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 
-public class BankMockingTest {
+class BankMockingTest {
     private Bank bank;
-    private Konto sender, empfaenger;
-    Girokonto girokonto;
-    private Ueberweisungsfaehig ueberweisungsfaehigSender, ueberweisungsfaehigEmpfaenger;
-    private Kunde inhaber;
+    private Girokonto sender, empfaenger;
+    private long kontonummerSender, kontonummerEmpfaenger;
+    ArgumentCaptor<Double> doubleArgumentCaptor = ArgumentCaptor.forClass(Double.class);
+    ArgumentCaptor<String> stringArgumentCaptor1 = ArgumentCaptor.forClass(String.class);
+    ArgumentCaptor<String> stringArgumentCaptor2 = ArgumentCaptor.forClass(String.class);
+    ArgumentCaptor<Long> longArgumentCaptor1 = ArgumentCaptor.forClass(Long.class);
+    ArgumentCaptor<Long> longArgumentCaptor2 = ArgumentCaptor.forClass(Long.class);
 
     @BeforeEach
-    void setUp() throws KontonummerNichtVorhandenException {
+    void setUp() {
         bank = new Bank(12345678L);
-        sender = Mockito.mock(Girokonto.class);
-        empfaenger = Mockito.mock(Girokonto.class);
-        inhaber = Mockito.mock(Kunde.class);
+        sender = mock(Girokonto.class);
+        empfaenger = mock(Girokonto.class);
+        Kunde senderKunde = mock(Kunde.class);
+        Kunde empfaengerKunde = mock(Kunde.class);
 
-        Mockito.when(inhaber.getName()).thenReturn("Mustermann");
-        Mockito.when(bank.mockEinfuegen(sender)).thenReturn(10000000L);
-        Mockito.when(bank.mockEinfuegen(empfaenger)).thenReturn(20000000L);
+        when(senderKunde.getName()).thenReturn("Mustermann");
+        when(empfaengerKunde.getName()).thenReturn("Musterfrau");
 
-        long kontonummerSender = bank.mockEinfuegen(sender);
-        long kontonummerEmpfaenger = bank.mockEinfuegen(empfaenger);
+        when(sender.getInhaber()).thenReturn(senderKunde);
+        when(empfaenger.getInhaber()).thenReturn(empfaengerKunde);
 
-        Mockito.when(bank.getKontostand(kontonummerSender)).thenReturn(500.0);
-        Mockito.when(bank.getKontostand(kontonummerEmpfaenger)).thenReturn(1000.0);
+        kontonummerSender = bank.mockEinfuegen(sender);
+        kontonummerEmpfaenger = bank.mockEinfuegen(empfaenger);
 
     }
 
     @Test
-    void testMockEinfuegen() {
-        long kontonummer1 = bank.mockEinfuegen(sender);
-        long kontonummer2 = bank.mockEinfuegen(empfaenger);
+    void testGeldUeberweisen() throws GesperrtException {
+        double betrag = 200.0;
+        String verwendungszweck = "Testzweck";
 
-        assertEquals(10000000L, kontonummer1);
-        assertEquals(20000000L, kontonummer2);
+        when(sender.getKontonummer()).thenReturn(kontonummerSender);
+        when(empfaenger.getKontonummer()).thenReturn(kontonummerEmpfaenger);
+        when(sender.ueberweisungAbsenden(betrag, empfaenger.getInhaber().getName(), kontonummerEmpfaenger, bank.getBankleitzahl(), verwendungszweck)).thenReturn(true);
+
+        assertTrue(bank.geldUeberweisen(sender.getKontonummer(), empfaenger.getKontonummer(), betrag, verwendungszweck));
+
+        verify(sender, times(1)).ueberweisungAbsenden(doubleArgumentCaptor.capture(), stringArgumentCaptor1.capture(), longArgumentCaptor1.capture(), longArgumentCaptor2.capture(), stringArgumentCaptor2.capture());
+        verify(empfaenger, times(1)).ueberweisungEmpfangen(betrag, sender.getInhaber().getName(), kontonummerSender, bank.getBankleitzahl(), verwendungszweck);
+
+
+        assertEquals(betrag, doubleArgumentCaptor.getValue());
+        assertEquals(empfaenger.getInhaber().getName(), stringArgumentCaptor1.getValue());
+        assertEquals(empfaenger.getKontonummer(), longArgumentCaptor1.getValue());
+        assertEquals(bank.getBankleitzahl(), longArgumentCaptor2.getValue());
+        assertEquals(verwendungszweck, stringArgumentCaptor2.getValue());
+
     }
 
     @Test
-    void testGetKontostand() throws KontonummerNichtVorhandenException {
-        double kontostand1 = bank.getKontostand(10000000L);
-        double kontostand2 = bank.getKontostand(20000000L);
+    void testGeldUeberweisenMitKontoGesperrt() throws GesperrtException {
+        double betrag = 200.0;
+        String verwendungszweck = "Testzweck";
 
-        assertEquals(500.0, kontostand1);
-        assertEquals(1000.0, kontostand2);
+        when(sender.getKontonummer()).thenReturn(kontonummerSender);
+        when(empfaenger.getKontonummer()).thenReturn(kontonummerEmpfaenger);
+        // when(sender.isGesperrt()).thenReturn(true);
+        // sender muss GesperrtException werfen und nicht prüfen, ob es gesperrt ist
+
+        assertThrowsExactly(GesperrtException.class, () -> bank.geldUeberweisen(sender.getKontonummer(), empfaenger.getKontonummer(), betrag, verwendungszweck));
+
+        verify(sender, times(0)).ueberweisungAbsenden(anyDouble(), anyString(), anyLong(), anyLong(), anyString());
+        verify(empfaenger, times(0)).ueberweisungEmpfangen(anyDouble(), anyString(), anyLong(), anyLong(), anyString());
     }
+
+    // TODO Kontolöschen -> Liste aller Kontonummern zurückgeben lassen und prüfen, ob die Nummer nicht mehr vorhanden ist oder mit Konto interagieren
+    //
 
 }

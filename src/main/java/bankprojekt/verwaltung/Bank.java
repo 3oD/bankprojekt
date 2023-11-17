@@ -11,7 +11,7 @@ import java.util.*;
 public class Bank {
     private final long bankleitzahl;
     private final Map<Long, Konto> kontoMap = new HashMap<>();
-    private static long kontonummerZaehler = 10000000L;
+    private long kontonummerZaehler = 10000000L;
     private static final double STANDARD_DISPO = 1000;
 
     /**
@@ -76,8 +76,10 @@ public class Bank {
     }
 
     public long mockEinfuegen(Konto k) {
-        kontoMap.put(k.getKontonummer(), k);
-        return k.getKontonummer();
+        long kontonummer = generiereEindeutigeKontonummer();
+
+        kontoMap.put(kontonummer,k);
+        return kontonummer;
     }
 
     /**
