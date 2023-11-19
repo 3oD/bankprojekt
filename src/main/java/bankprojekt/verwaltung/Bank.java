@@ -75,6 +75,12 @@ public class Bank {
         return kontoErstellen(new Sparbuch(inhaber, generiereEindeutigeKontonummer()));
     }
 
+    /**
+     * Inserts a mock bank account into the bank's account map.
+     *
+     * @param k the bank account to be inserted
+     * @return the account number of the inserted bank account
+     */
     public long mockEinfuegen(Konto k) {
         long kontonummer = generiereEindeutigeKontonummer();
 

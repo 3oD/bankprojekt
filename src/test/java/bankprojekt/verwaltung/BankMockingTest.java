@@ -8,11 +8,7 @@ import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.withSettings;
+import static org.mockito.Mockito.*;
 
 class BankMockingTest {
     private Bank bank;
@@ -213,7 +209,10 @@ class BankMockingTest {
         Assertions.assertThrowsExactly(KontonummerNichtVorhandenException.class, () -> bank.geldAbheben(kontonummerEmpfaenger, 20.0));
         assertFalse(bank.getAlleKontonummern().contains(kontonummerEmpfaenger));
     }
-    // TODO Kontolöschen -> Liste aller Kontonummern zurückgeben lassen und prüfen, ob die Nummer nicht mehr vorhanden ist oder mit Konto interagieren
-    //
+
+    @Test
+    void testKontoLoeschenKontoNichtVorhanden() {
+        assertFalse(bank.kontoLoeschen(1564879498L));
+    }
 
 }
