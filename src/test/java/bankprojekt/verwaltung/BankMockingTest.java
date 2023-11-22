@@ -34,8 +34,10 @@ class BankMockingTest {
 
         when(senderKunde.getName()).thenReturn("Mustermann");
         when(senderKunde.getVorname()).thenReturn("Max");
+        when(senderKunde.getAdresse()).thenReturn("Musterstrasse 1");
         when(empfaengerKunde.getName()).thenReturn("Musterfrau");
         when(empfaengerKunde.getVorname()).thenReturn("Maria");
+        when(empfaengerKunde.getAdresse()).thenReturn("Musterstrasse 2");
 
         when(sender.getInhaber()).thenReturn(senderKunde);
         when(empfaenger.getInhaber()).thenReturn(empfaengerKunde);
@@ -78,7 +80,7 @@ class BankMockingTest {
         assertFalse(bank.geldUeberweisen(sender.getKontonummer(), empfaenger.getKontonummer(), betrag, verwendungszweck));
 
         verify(ueberweisungsfaehigSender, times(1)).ueberweisungAbsenden(doubleArgumentCaptor.capture(), stringArgumentCaptor1.capture(), longArgumentCaptor1.capture(), longArgumentCaptor2.capture(), stringArgumentCaptor2.capture());
-        verify(ueberweisungsfaehigEmpfaenger, times(0)).ueberweisungEmpfangen(anyDouble(), anyString(), anyLong(), anyLong(), anyString());
+        verify(ueberweisungsfaehigEmpfaenger, never()).ueberweisungEmpfangen(anyDouble(), anyString(), anyLong(), anyLong(), anyString());
 
 
         assertEquals(betrag, doubleArgumentCaptor.getValue());
@@ -102,7 +104,7 @@ class BankMockingTest {
         assertFalse(bank.geldUeberweisen(sender.getKontonummer(), empfaenger.getKontonummer(), betrag, verwendungszweck));
 
         verify(ueberweisungsfaehigSender, times(1)).ueberweisungAbsenden(anyDouble(), anyString(), anyLong(), anyLong(), anyString());
-        verify(ueberweisungsfaehigEmpfaenger, times(0)).ueberweisungEmpfangen(anyDouble(), anyString(), anyLong(), anyLong(), anyString());
+        verify(ueberweisungsfaehigEmpfaenger, never()).ueberweisungEmpfangen(anyDouble(), anyString(), anyLong(), anyLong(), anyString());
     }
 
     @Test
@@ -119,8 +121,8 @@ class BankMockingTest {
         Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> bank.geldUeberweisen(sender.getKontonummer(), empfaenger.getKontonummer(), betrag, verwendungszweckLeerString));
         Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> bank.geldUeberweisen(sender.getKontonummer(), empfaenger.getKontonummer(), betrag, verwendungszweckLeerzeichen));
 
-        verify(ueberweisungsfaehigSender, times(0)).ueberweisungAbsenden(anyDouble(), anyString(), anyLong(), anyLong(), anyString());
-        verify(ueberweisungsfaehigEmpfaenger, times(0)).ueberweisungEmpfangen(anyDouble(), anyString(), anyLong(), anyLong(), anyString());
+        verify(ueberweisungsfaehigSender, never()).ueberweisungAbsenden(anyDouble(), anyString(), anyLong(), anyLong(), anyString());
+        verify(ueberweisungsfaehigEmpfaenger, never()).ueberweisungEmpfangen(anyDouble(), anyString(), anyLong(), anyLong(), anyString());
     }
 
     @Test
@@ -141,8 +143,8 @@ class BankMockingTest {
         Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> bank.geldUeberweisen(sender.getKontonummer(), empfaenger.getKontonummer(), betragInfinite, verwendungszweck));
         Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> bank.geldUeberweisen(sender.getKontonummer(), empfaenger.getKontonummer(), betragNull, verwendungszweck));
 
-        verify(ueberweisungsfaehigSender, times(0)).ueberweisungAbsenden(anyDouble(), anyString(), anyLong(), anyLong(), anyString());
-        verify(ueberweisungsfaehigEmpfaenger, times(0)).ueberweisungEmpfangen(anyDouble(), anyString(), anyLong(), anyLong(), anyString());
+        verify(ueberweisungsfaehigSender, never()).ueberweisungAbsenden(anyDouble(), anyString(), anyLong(), anyLong(), anyString());
+        verify(ueberweisungsfaehigEmpfaenger, never()).ueberweisungEmpfangen(anyDouble(), anyString(), anyLong(), anyLong(), anyString());
     }
 
     @Test
@@ -156,7 +158,7 @@ class BankMockingTest {
 
         assertFalse(bank.geldUeberweisen(sender.getKontonummer(), kontoNichtUeberweisungsfaehig.getKontonummer(), betrag, verwendungszweck));
 
-        verify(ueberweisungsfaehigSender, times(0)).ueberweisungAbsenden(anyDouble(), anyString(), anyLong(), anyLong(), anyString());
+        verify(ueberweisungsfaehigSender, never()).ueberweisungAbsenden(anyDouble(), anyString(), anyLong(), anyLong(), anyString());
     }
 
     @Test
@@ -170,7 +172,7 @@ class BankMockingTest {
 
         assertFalse(bank.geldUeberweisen(kontoNichtUeberweisungsfaehig.getKontonummer(), empfaenger.getKontonummer(), betrag, verwendungszweck));
 
-        verify(ueberweisungsfaehigEmpfaenger, times(0)).ueberweisungEmpfangen(anyDouble(), anyString(), anyLong(), anyLong(), anyString());
+        verify(ueberweisungsfaehigEmpfaenger, never()).ueberweisungEmpfangen(anyDouble(), anyString(), anyLong(), anyLong(), anyString());
     }
 
     @Test
@@ -184,7 +186,7 @@ class BankMockingTest {
 
         assertFalse(bank.geldUeberweisen(kontonummer, empfaenger.getKontonummer(), betrag, verwendungszweck));
 
-        verify(ueberweisungsfaehigEmpfaenger, times(0)).ueberweisungEmpfangen(anyDouble(), anyString(), anyLong(), anyLong(), anyString());
+        verify(ueberweisungsfaehigEmpfaenger, never()).ueberweisungEmpfangen(anyDouble(), anyString(), anyLong(), anyLong(), anyString());
     }
 
     @Test
@@ -198,7 +200,7 @@ class BankMockingTest {
 
         assertFalse(bank.geldUeberweisen(sender.getKontonummer(), kontonummer, betrag, verwendungszweck));
 
-        verify(ueberweisungsfaehigSender, times(0)).ueberweisungAbsenden(anyDouble(), anyString(), anyLong(), anyLong(), anyString());
+        verify(ueberweisungsfaehigSender, never()).ueberweisungAbsenden(anyDouble(), anyString(), anyLong(), anyLong(), anyString());
     }
 
     @Test
@@ -215,9 +217,33 @@ class BankMockingTest {
     }
 
     @Test
-    @DisplayName("Test checks if ")
+    @DisplayName("Test checks if the account does not gets locked if the balance is below 0")
     void testPleitegeierSperren() {
+        when(sender.getKontostand()).thenReturn(-1000d);
 
+        bank.pleitegeierSperren();
+
+        verify(sender).sperren();
+    }
+
+    @Test
+    @DisplayName("Test checks if the account does not get locked if the balance is over 0")
+    void testPleitegeierSperrenKontostandUeberNull() {
+        when(sender.getKontostand()).thenReturn(1000d);
+
+        bank.pleitegeierSperren();
+
+        verify(sender, never()).sperren();
+    }
+
+    @Test
+    @DisplayName("Test checks if the account does not get locked if the balance is 0")
+    void testPleitegeierSperrenKontostandGenauNull() {
+        when(sender.getKontostand()).thenReturn(1000d);
+
+        bank.pleitegeierSperren();
+
+        verify(sender, never()).sperren();
     }
 
     /**
@@ -265,13 +291,42 @@ class BankMockingTest {
     @Test
     void testGetKundenadressenGleicheAdresse() {
         Kunde kunde1 = mock(Kunde.class);
-        when(kunde1.getAdresse()).thenReturn("Musterstrasse 1");
+
         when(sender.getInhaber()).thenReturn(kunde1);
         when(empfaenger.getInhaber()).thenReturn(kunde1);
+        when(kontoNichtUeberweisungsfaehig.getInhaber()).thenReturn(kunde1);
+
+        when(kunde1.getAdresse()).thenReturn("Musterstrasse 1");
+
+        when(kunde1.getVorname()).thenReturn("Max");
+        when(kunde1.getName()).thenReturn("Mustermann, Max");
 
         String actual = bank.getKundenadressen();
-        String expected = "Musterstrasse 1";
+        String expected = "Mustermann, Max: Musterstrasse 1";
 
-        assertEquals(actual, expected);
+        assertEquals(expected, actual);
+    }
+
+    /**
+     * Test to check whether `getKundenMitVollemKonto` method returns correct result.
+     */
+    @Test
+    void testGetKundenMitVollemKonto() {
+        Kunde kunde1 = mock(Kunde.class);
+        Kunde kunde2 = mock(Kunde.class);
+        Konto konto1 = mock(Konto.class);
+        Konto konto2 = mock(Konto.class);
+
+        when(konto1.getInhaber()).thenReturn(kunde1);
+        when(konto2.getInhaber()).thenReturn(kunde2);
+        when(konto1.getKontostand()).thenReturn(2000.0);
+        when(konto2.getKontostand()).thenReturn(500.0);
+
+        bank.mockEinfuegen(konto1);
+        bank.mockEinfuegen(konto2);
+
+        List<Kunde> result = bank.getKundenMitVollemKonto(1500);
+        Assertions.assertEquals(1, result.size());
+        Assertions.assertEquals(result.get(0), kunde1);
     }
 }
