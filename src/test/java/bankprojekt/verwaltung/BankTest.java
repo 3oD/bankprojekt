@@ -16,7 +16,7 @@ class BankTest {
     long kontoNummer1, kontoNummer2, kontoNummer3;
 
     @BeforeEach
-    void setup() throws KontonummerNichtVorhandenException {
+    void setup() throws KontonummerNichtVorhandenException, GesperrtException {
         b1 = new Bank(12312L);
         b2 = new Bank(145351L);
 

@@ -16,13 +16,26 @@ class KontoTest {
     Waehrung waehrungEUR = Waehrung.EUR;
 
     @BeforeEach
-    void setup() {
+    void setup() throws GesperrtException {
         kunde = new Kunde("Sebastian", "Gey", "hier", LocalDate.parse("1996-09-15"));
         girokonto = new Girokonto(kunde, 1234, 1000.0);
         sparbuch = new Sparbuch(kunde, 123456);
 
         girokonto.einzahlen(1000);
         sparbuch.einzahlen(1000);
+    }
+
+    @Test
+    void testSetInhaber() {
+        Kunde expectedKunde = new Kunde("Max", "Mustermann", "dort", LocalDate.parse("1990-01-01"));
+        girokonto.setInhaber(expectedKunde);
+
+        assertEquals(expectedKunde, girokonto.getInhaber());
+    }
+
+    @Test
+    void testSetInhaberNull() {
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> girokonto.setInhaber(null));
     }
 
     @Test

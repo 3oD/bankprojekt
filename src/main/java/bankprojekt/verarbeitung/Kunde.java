@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
 import java.util.Locale;
+import java.util.logging.Logger;
 
 /**
  * Kunde einer Bank
@@ -14,6 +15,11 @@ import java.util.Locale;
 public class Kunde implements Comparable<Kunde> {
 
     /**
+     * Logger-Konstante
+     */
+    private static final Logger LOGGER = Logger.getLogger(Kunde.class.getName());
+
+    /**
      * Ein Musterkunde
      */
     public static final Kunde MUSTERMANN = new Kunde("Max", "Mustermann", "zuhause", LocalDate.now());
@@ -21,7 +27,7 @@ public class Kunde implements Comparable<Kunde> {
     /**
      * englische oder deutsche Anrede, je nach den Systemeinstellungen
      */
-    private static String ANREDE;   //von der Idee her final, wegen der Verwendung des static-Blocks leider nicht möglich.
+    private static final String ANREDE;   //von der Idee her final, wegen der Verwendung des static-Blocks leider nicht möglich.
 
     /**
      * liefert die systemspezifische Anrede
@@ -47,7 +53,7 @@ public class Kunde implements Comparable<Kunde> {
     /**
      * Geburtstag
      */
-    private LocalDate geburtstag;
+    private final LocalDate geburtstag;
 
     /**
      * erzeugt den Standardkunden Max Mustermann
@@ -74,7 +80,7 @@ public class Kunde implements Comparable<Kunde> {
         this.geburtstag = gebdat;
 
         Runtime umgebung = Runtime.getRuntime();
-        Runnable r = () -> System.out.println("Kunde " + Kunde.this.getName() + " zerstört");
+        Runnable r = () -> LOGGER.info("Kunde " + Kunde.this.getName() + " zerstört");
         Thread t = new Thread(r);
         umgebung.addShutdownHook(t);
     }

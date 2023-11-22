@@ -38,7 +38,8 @@ public class Sparbuch extends Konto {
     /**
      * ein Standard-Sparbuch
      */
-    public Sparbuch() {
+    public Sparbuch() throws GesperrtException {
+        super();
         zinssatz = 0.03;
     }
 
@@ -49,7 +50,7 @@ public class Sparbuch extends Konto {
      * @param kontonummer die Wunsch-Kontonummer
      * @throws IllegalArgumentException wenn inhaber null ist
      */
-    public Sparbuch(Kunde inhaber, long kontonummer) {
+    public Sparbuch(Kunde inhaber, long kontonummer) throws GesperrtException {
         super(inhaber, kontonummer);
         zinssatz = 0.03;
     }

@@ -42,17 +42,13 @@ public abstract class Konto implements Comparable<Konto> {
     private boolean gesperrt;
 
     /**
-     * Setzt die beiden Eigenschaften kontoinhaber und kontonummer auf die angegebenen Werte,
-     * der anfängliche Kontostand wird auf 0 gesetzt.
+     * Constructs a new Konto object with the specified owner and account number.
      *
-     * @param inhaber     der Inhaber
-     * @param kontonummer die gewünschte Kontonummer
-     * @throws IllegalArgumentException wenn der inhaber null ist
+     * @param inhaber The owner of the account
+     * @param kontonummer The account number
      */
-    public Konto(Kunde inhaber, long kontonummer) {
-        if (inhaber == null)
-            throw new IllegalArgumentException("Inhaber darf nicht null sein!");
-        this.inhaber = inhaber;
+    Konto(Kunde inhaber, long kontonummer) {
+        setInhaber(inhaber);
         this.nummer = kontonummer;
         this.kontostand = 0;
         this.gesperrt = false;
@@ -61,7 +57,7 @@ public abstract class Konto implements Comparable<Konto> {
     /**
      * setzt alle Eigenschaften des Kontos auf Standardwerte
      */
-    public Konto() {
+    Konto() {
         this(Kunde.MUSTERMANN, 1234567);
     }
 
@@ -75,17 +71,14 @@ public abstract class Konto implements Comparable<Konto> {
     }
 
     /**
-     * setzt den Kontoinhaber
+     * Sets the owner of the account.
      *
-     * @param kinh neuer Kontoinhaber
-     * @throws GesperrtException        wenn das Konto gesperrt ist
-     * @throws IllegalArgumentException wenn kinh null ist
+     * @param kinh the owner of the account
+     * @throws IllegalArgumentException if the owner is null
      */
-    public final void setInhaber(Kunde kinh) throws GesperrtException {
+    public final void setInhaber(Kunde kinh) {
         if (kinh == null)
             throw new IllegalArgumentException("Der Inhaber darf nicht null sein!");
-        if (this.gesperrt)
-            throw new GesperrtException(this.nummer);
         this.inhaber = kinh;
 
     }
@@ -134,10 +127,10 @@ public abstract class Konto implements Comparable<Konto> {
     public String toString() {
         String ausgabe;
         ausgabe = "Kontonummer: " + this.getKontonummerFormatiert()
-                + System.getProperty("line.separator");
+                + System.lineSeparator();
         ausgabe += "Inhaber: " + this.inhaber;
         ausgabe += "Aktueller Kontostand: " + getKontostandFormatiert() + " ";
-        ausgabe += this.getGesperrtText() + System.getProperty("line.separator");
+        ausgabe += this.getGesperrtText() + System.lineSeparator();
         return ausgabe;
     }
 
@@ -215,10 +208,7 @@ public abstract class Konto implements Comparable<Konto> {
             return false;
         if (this.getClass() != other.getClass())
             return false;
-        if (this.nummer == ((Konto) other).nummer)
-            return true;
-        else
-            return false;
+        return this.nummer == ((Konto) other).nummer;
     }
 
     @Override
@@ -228,11 +218,7 @@ public abstract class Konto implements Comparable<Konto> {
 
     @Override
     public int compareTo(Konto other) {
-        if (other.getKontonummer() > this.getKontonummer())
-            return -1;
-        if (other.getKontonummer() < this.getKontonummer())
-            return 1;
-        return 0;
+        return Long.compare(this.getKontonummer(), other.getKontonummer());
     }
 
     /**

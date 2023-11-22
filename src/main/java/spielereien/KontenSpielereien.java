@@ -16,7 +16,7 @@ public class KontenSpielereien {
      *
      * @param args wird nicht benutzt
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws GesperrtException {
         String eingabe = "FESTGELDKONTO";
 
         Kontoart art = Kontoart.valueOf(eingabe);

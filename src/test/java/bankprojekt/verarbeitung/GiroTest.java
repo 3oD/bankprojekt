@@ -13,7 +13,7 @@ class GiroTest {
     Kunde kunde;
 
     @BeforeEach
-    void setup() {
+    void setup() throws GesperrtException {
         kunde = new Kunde("Sebastian", "Gey", "hier", LocalDate.parse("1996-09-15"));
 
         girokonto1 = new Girokonto();
@@ -22,9 +22,8 @@ class GiroTest {
 
     @Test
     void testConstructorUngueltigerDispo() {
-        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
-            Girokonto girokonto = new Girokonto(kunde, 6546546L, -156);
-        });
+        Assertions.assertThrowsExactly(IllegalArgumentException.class,
+                () -> new Girokonto(kunde, 6546546L, -156));
     }
 
     @Test

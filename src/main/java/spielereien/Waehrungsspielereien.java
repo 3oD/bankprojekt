@@ -16,7 +16,7 @@ public class Waehrungsspielereien {
      *
      * @param args wird nicht verwendet
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws GesperrtException {
         try {
             Kunde ich = new Kunde("Dorothea", "Hubrich", "zuhause", LocalDate.parse("1976-07-13"));
             Konto meinKonto = new Girokonto(ich, 1234, 1000.0);

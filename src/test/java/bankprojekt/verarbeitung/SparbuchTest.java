@@ -14,7 +14,7 @@ class SparbuchTest {
     Kunde kunde;
 
     @BeforeEach
-    void setup() {
+    void setup() throws GesperrtException {
         kunde = new Kunde("Sebastian", "Gey", "hier", LocalDate.parse("1996-09-15"));
 
         sparbuch1 = new Sparbuch();
