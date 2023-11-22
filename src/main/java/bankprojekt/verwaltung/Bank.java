@@ -64,7 +64,7 @@ public class Bank {
      * @param inhaber the owner of the girokonto
      * @return the account number of the newly created girokonto
      */
-    public long girokontoErstellen(Kunde inhaber) throws GesperrtException {
+    public long girokontoErstellen(Kunde inhaber) {
         return kontoErstellen(new Girokonto(inhaber, generiereEindeutigeKontonummer(), STANDARD_DISPO));
     }
 
