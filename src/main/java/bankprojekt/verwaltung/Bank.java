@@ -3,6 +3,8 @@ package bankprojekt.verwaltung;
 import bankprojekt.verarbeitung.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 /**
  * The Bank class represents a bank with a given bank code (Bankleitzahl). It provides methods for creating accounts,
@@ -13,6 +15,7 @@ public class Bank {
     private final Map<Long, Konto> kontoMap = new HashMap<>();
     private long kontonummerZaehler = 10000000L;
     private static final double STANDARD_DISPO = 1000;
+    private static final long MINIMUM_KONTONUMMER = 10000000L;
 
     /**
      * Represents a bank with a specific bank code.
@@ -84,7 +87,7 @@ public class Bank {
     public long mockEinfuegen(Konto k) {
         long kontonummer = generiereEindeutigeKontonummer();
 
-        kontoMap.put(kontonummer,k);
+        kontoMap.put(kontonummer, k);
         return kontonummer;
     }
 
@@ -216,9 +219,9 @@ public class Bank {
     /**
      * Transfers the specified amount of money from one account to another.
      *
-     * @param vonKontonr      the account number for the sender
-     * @param nachKontonr     the account number for the recipient
-     * @param betrag          the amount of money to transfer
+     * @param vonKontonr       the account number for the sender
+     * @param nachKontonr      the account number for the recipient
+     * @param betrag           the amount of money to transfer
      * @param verwendungszweck the purpose of the money transfer
      * @return true if the money transfer was successful, false otherwise
      * @throws IllegalArgumentException if the amount is negative, zero, infinit or NaN, or if the purpose is blank
@@ -286,7 +289,61 @@ public class Bank {
      * @param verwendungszweck the purpose of the money transfer
      */
     void empfangeUeberweisung(Ueberweisungsfaehig empfaenger, double betrag, String vonName,
-                                      long vonKontonr, long vonBlz, String verwendungszweck) {
+                              long vonKontonr, long vonBlz, String verwendungszweck) {
         empfaenger.ueberweisungEmpfangen(betrag, vonName, vonKontonr, vonBlz, verwendungszweck);
     }
+
+    /**
+     * Locks all bank accounts with a negative account balance.
+     * Once locked, the account cannot be accessed or modified.
+     * This method iterates over all bank accounts in the bank and filters out
+     * the ones with a negative account balance. It then calls the {@link Konto#sperren()} method
+     * for each filtered account to lock it.
+     */
+    public void pleitegeierSperren() {
+        kontoMap.values().stream()
+                .filter(konto -> konto.getKontostand() < 0)
+                .forEach(Konto::sperren);
+    }
+
+    /**
+     * Retrieves a list of customers with a bank account balance equal to or greater than the specified minimum amount.
+     *
+     * @param minimum the minimum account balance
+     * @return a list of customers with a bank account balance equal to or greater than the minimum
+     */
+    public List<Kunde> getKundenMitVollemKonto(double minimum) {
+        return kontoMap.values().stream()
+                .filter(konto -> konto.getKontostand() >= minimum)
+                .map(Konto::getInhaber)
+                .toList();
+    }
+
+    /**
+     * Retrieves the name and addresses of all customers associated with bank accounts in this bank.
+     *
+     * @return a string containing the addresses of all customers, separated by a new line
+     */
+    public String getKundenadressen() {
+        return kontoMap.values().stream()
+                .map(Konto::getInhaber)
+                .distinct()
+                .sorted(Comparator.comparing(Kunde::getVorname))
+                .map(kunde -> kunde.getName() + ": " + kunde.getAdresse())
+                .collect(Collectors.joining(System.lineSeparator()));
+    }
+
+    /**
+     * Retrieves a list of account numbers with gaps in the range of existing account numbers.
+     *
+     * @return a list of account numbers with gaps
+     */
+    public List<Long> getKontonummernLuecken() {
+        long upperBound = kontonummerZaehler - 1; // current highest account number
+        return LongStream.rangeClosed(MINIMUM_KONTONUMMER, upperBound)
+                .boxed() // convert to Stream<Long>
+                .filter(num -> !kontoMap.containsKey(num)) // filter out keys that are in use
+                .toList();
+    }
+
 }

@@ -3,8 +3,11 @@ package bankprojekt.verwaltung;
 import bankprojekt.verarbeitung.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -30,7 +33,9 @@ class BankMockingTest {
         Kunde empfaengerKunde = mock(Kunde.class);
 
         when(senderKunde.getName()).thenReturn("Mustermann");
+        when(senderKunde.getVorname()).thenReturn("Max");
         when(empfaengerKunde.getName()).thenReturn("Musterfrau");
+        when(empfaengerKunde.getVorname()).thenReturn("Maria");
 
         when(sender.getInhaber()).thenReturn(senderKunde);
         when(empfaenger.getInhaber()).thenReturn(empfaengerKunde);
@@ -55,15 +60,8 @@ class BankMockingTest {
 
         assertTrue(bank.geldUeberweisen(sender.getKontonummer(), empfaenger.getKontonummer(), betrag, verwendungszweck));
 
-        verify(ueberweisungsfaehigSender, times(1)).ueberweisungAbsenden(doubleArgumentCaptor.capture(), stringArgumentCaptor1.capture(), longArgumentCaptor1.capture(), longArgumentCaptor2.capture(), stringArgumentCaptor2.capture());
+        verify(ueberweisungsfaehigSender, times(1)).ueberweisungAbsenden(betrag, "Musterfrau", empfaenger.getKontonummer(), bank.getBankleitzahl(), verwendungszweck);
         verify(ueberweisungsfaehigEmpfaenger, times(1)).ueberweisungEmpfangen(betrag, sender.getInhaber().getName(), kontonummerSender, bank.getBankleitzahl(), verwendungszweck);
-
-
-        assertEquals(betrag, doubleArgumentCaptor.getValue());
-        assertEquals(empfaenger.getInhaber().getName(), stringArgumentCaptor1.getValue());
-        assertEquals(empfaenger.getKontonummer(), longArgumentCaptor1.getValue());
-        assertEquals(bank.getBankleitzahl(), longArgumentCaptor2.getValue());
-        assertEquals(verwendungszweck, stringArgumentCaptor2.getValue());
     }
 
     @Test
@@ -211,8 +209,69 @@ class BankMockingTest {
     }
 
     @Test
+    @DisplayName("Test checks if an account that does not exist can be deleted from the bank.")
     void testKontoLoeschenKontoNichtVorhanden() {
         assertFalse(bank.kontoLoeschen(1564879498L));
     }
 
+    @Test
+    @DisplayName("Test checks if ")
+    void testPleitegeierSperren() {
+
+    }
+
+    /**
+     * Test checks if unused account numbers are correctly identified.
+     */
+    @Test
+    @DisplayName("Test checks if unused account numbers are correctly identified")
+    void testGetKontonummernLuecken() throws KontonummerNichtVorhandenException {
+        List<Long> accountedNums = bank.getKontonummernLuecken();
+        assertEquals(0, accountedNums.size(), "Expect initial unused account list to be empty");
+
+        bank.kontoLoeschen(10000000L); // remove account
+        accountedNums = bank.getKontonummernLuecken();
+        assertEquals(1, accountedNums.size(), "Expect unused account list to have 1 number after an account is deleted");
+        assertEquals(10000000L, accountedNums.get(0), "Expect 10000000L to be the unused account number");
+    }
+
+    @Test
+    void testGetKundenadressenUnterschiedlicheAdresse() {
+        Kunde kunde1 = mock(Kunde.class);
+        Kunde kunde2 = mock(Kunde.class);
+        Kunde kunde3 = mock(Kunde.class);
+
+        when(sender.getInhaber()).thenReturn(kunde1);
+        when(empfaenger.getInhaber()).thenReturn(kunde2);
+        when(kontoNichtUeberweisungsfaehig.getInhaber()).thenReturn(kunde3);
+
+        when(kunde1.getAdresse()).thenReturn("Musterstrasse 1");
+        when(kunde2.getAdresse()).thenReturn("Musterstrasse 2");
+        when(kunde3.getAdresse()).thenReturn("Musterstrasse 3");
+
+        when(kunde1.getVorname()).thenReturn("Max");
+        when(kunde1.getName()).thenReturn("Mustermann, Max");
+        when(kunde2.getVorname()).thenReturn("Maria");
+        when(kunde2.getName()).thenReturn("Musterfrau, Maria");
+        when(kunde3.getVorname()).thenReturn("John");
+        when(kunde3.getName()).thenReturn("Doe, John");
+
+        String actual = bank.getKundenadressen();
+        String expected = "Doe, John: Musterstrasse 3" + System.lineSeparator() + "Musterfrau, Maria: Musterstrasse 2" + System.lineSeparator() + "Mustermann, Max: Musterstrasse 1";
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testGetKundenadressenGleicheAdresse() {
+        Kunde kunde1 = mock(Kunde.class);
+        when(kunde1.getAdresse()).thenReturn("Musterstrasse 1");
+        when(sender.getInhaber()).thenReturn(kunde1);
+        when(empfaenger.getInhaber()).thenReturn(kunde1);
+
+        String actual = bank.getKundenadressen();
+        String expected = "Musterstrasse 1";
+
+        assertEquals(actual, expected);
+    }
 }

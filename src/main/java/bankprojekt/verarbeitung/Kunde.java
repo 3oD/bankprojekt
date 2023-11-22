@@ -74,24 +74,10 @@ public class Kunde implements Comparable<Kunde> {
         this.geburtstag = gebdat;
 
         Runtime umgebung = Runtime.getRuntime();
-        Runnable r = new Zerstoerer();
+        Runnable r = () -> System.out.println("Kunde " + Kunde.this.getName() + " zerstört");
         Thread t = new Thread(r);
         umgebung.addShutdownHook(t);
-
     }
-
-    /**
-     * Klasse für Aufräumarbeiten
-     *
-     * @author Doro
-     */
-    private class Zerstoerer implements Runnable {
-        @Override
-        public void run() {
-            System.out.println("Kunde " + Kunde.this.getName() + " zerstört");
-        }
-    }
-
 
     /**
      * Erzeugt einen Kunden mit den übergebenen Werten
@@ -114,9 +100,9 @@ public class Kunde implements Comparable<Kunde> {
     public String toString() {
         String ausgabe;
         DateTimeFormatter df = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
-        ausgabe = this.vorname + " " + this.nachname + System.getProperty("line.separator");
-        ausgabe += this.adresse + System.getProperty("line.separator");
-        ausgabe += df.format(this.geburtstag) + System.getProperty("line.separator");
+        ausgabe = this.vorname + " " + this.nachname + System.lineSeparator();
+        ausgabe += this.adresse + System.lineSeparator();
+        ausgabe += df.format(this.geburtstag) + System.lineSeparator();
         return ausgabe;
     }
 

@@ -13,7 +13,7 @@ public class Sparbuch extends Konto {
     /**
      * Zinssatz, mit dem das Sparbuch verzinst wird. 0,03 entspricht 3%
      */
-    private double zinssatz;
+    private final double zinssatz;
 
     /**
      * Monatlich erlaubter Gesamtbetrag für Abhebungen
@@ -65,10 +65,9 @@ public class Sparbuch extends Konto {
 
     @Override
     public String toString() {
-        String ausgabe = "-- SPARBUCH --" + System.lineSeparator() +
+        return "-- SPARBUCH --" + System.lineSeparator() +
                 super.toString()
                 + "Zinssatz: " + this.zinssatz * 100 + "%" + System.lineSeparator();
-        return ausgabe;
     }
 
     @Override
@@ -107,6 +106,16 @@ public class Sparbuch extends Konto {
         bereitsAbgehoben = neu.euroInWaehrungUmrechnen(bereitsAbgehobenInEUR);
 
         super.waehrungswechsel(neu);
+    }
+
+    @Override
+    public boolean equals(Object other){
+        return super.equals(other);
+    }
+
+    @Override
+    public int hashCode(){
+        return super.hashCode();
     }
 
 }

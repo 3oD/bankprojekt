@@ -82,10 +82,9 @@ public class Girokonto extends Konto implements Ueberweisungsfaehig {
 
     @Override
     public String toString() {
-        String ausgabe = "-- GIROKONTO --" + System.lineSeparator() +
+        return "-- GIROKONTO --" + System.lineSeparator() +
                 super.toString()
                 + "Dispo: " + this.dispo + " " + getAktuelleWaehrung() + System.lineSeparator();
-        return ausgabe;
     }
 
     @Override
@@ -104,14 +103,19 @@ public class Girokonto extends Konto implements Ueberweisungsfaehig {
 
     @Override
     public void waehrungswechsel(Waehrung neu) {
-        /** rechne Kontostand in Euro um */
         double dispoInEUR = getAktuelleWaehrung().waehrungInEuroUmrechnen(getDispo());
-
-        /** rechne den umgerechneten Kontostand in die gewünschte neue Währung um und setze als Kontostand/Dispo */
         setDispo(neu.euroInWaehrungUmrechnen(dispoInEUR));
-
-        /** setze Währung auf neue um */
         super.waehrungswechsel(neu);
+    }
+
+    @Override
+    public boolean equals(Object other){
+        return super.equals(other);
+    }
+
+    @Override
+    public int hashCode(){
+        return super.hashCode();
     }
 
 }
