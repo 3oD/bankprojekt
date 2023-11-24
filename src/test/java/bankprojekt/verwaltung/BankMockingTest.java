@@ -206,7 +206,7 @@ class BankMockingTest {
     @Test
     void testKontoLoeschen() {
         assertTrue(bank.kontoLoeschen(kontonummerEmpfaenger));
-        Assertions.assertThrowsExactly(KontonummerNichtVorhandenException.class, () -> bank.geldAbheben(kontonummerEmpfaenger, 20.0));
+        Assertions.assertThrowsExactly(KontonummerDoesNotExistException.class, () -> bank.geldAbheben(kontonummerEmpfaenger, 20.0));
         assertFalse(bank.getAlleKontonummern().contains(kontonummerEmpfaenger));
     }
 
@@ -251,7 +251,7 @@ class BankMockingTest {
      */
     @Test
     @DisplayName("Test checks if unused account numbers are correctly identified")
-    void testGetKontonummernLuecken() throws KontonummerNichtVorhandenException {
+    void testGetKontonummernLuecken() throws KontonummerDoesNotExistException {
         List<Long> accountedNums = bank.getKontonummernLuecken();
         assertEquals(0, accountedNums.size(), "Expect initial unused account list to be empty");
 

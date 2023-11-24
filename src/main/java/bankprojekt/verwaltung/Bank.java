@@ -140,17 +140,17 @@ public class Bank {
      * Validates a bank account with the given account number.
      *
      * @param nummer the account number to be validated
-     * @throws KontonummerNichtVorhandenException if the account number does not exist
+     * @throws KontonummerDoesNotExistException if the account number does not exist
      * @throws IllegalArgumentException           if the account number is invalid
      */
-    private void validiereKonto(long nummer) throws KontonummerNichtVorhandenException {
+    private void validiereKonto(long nummer) throws KontonummerDoesNotExistException {
         if (!kontoMap.containsKey(nummer)) {
-            throw new KontonummerNichtVorhandenException(nummer);
+            throw new KontonummerDoesNotExistException(nummer);
         }
     }
 
     /**
-     * Validates the given amount.
+     * Validates a specified amount to ensure it is a valid value.
      *
      * @param betrag the amount to be validated
      * @throws IllegalArgumentException if the amount is less than or equal to 0, NaN, or infinite
@@ -158,7 +158,7 @@ public class Bank {
     private void validiereBetrag(double betrag) {
 
         if (betrag <= 0 || Double.isNaN(betrag) || Double.isInfinite(betrag)) {
-            throw new IllegalArgumentException("Der Betrag muss größer als 0 sein.");
+            throw new IllegalArgumentException("Invalid amount");
         }
     }
 
@@ -168,10 +168,10 @@ public class Bank {
      * @param nummer the account number to withdraw from
      * @param betrag the amount of money to withdraw
      * @return true if the withdrawal was successful, false otherwise
-     * @throws KontonummerNichtVorhandenException if the account number does not exist
+     * @throws KontonummerDoesNotExistException if the account number does not exist
      * @throws GesperrtException                  if the account is locked
      */
-    public boolean geldAbheben(long nummer, double betrag) throws KontonummerNichtVorhandenException, GesperrtException {
+    public boolean geldAbheben(long nummer, double betrag) throws KontonummerDoesNotExistException, GesperrtException {
         validiereKonto(nummer);
         validiereBetrag(betrag);
         return kontoMap.get(nummer).abheben(betrag);
@@ -182,9 +182,9 @@ public class Bank {
      *
      * @param auf    the account number to deposit into
      * @param betrag the amount of money to deposit
-     * @throws KontonummerNichtVorhandenException if the account number does not exist
+     * @throws KontonummerDoesNotExistException if the account number does not exist
      */
-    public void geldEinzahlen(long auf, double betrag) throws KontonummerNichtVorhandenException {
+    public void geldEinzahlen(long auf, double betrag) throws KontonummerDoesNotExistException {
         validiereKonto(auf);
         validiereBetrag(betrag);
         kontoMap.get(auf).einzahlen(betrag);
@@ -209,9 +209,9 @@ public class Bank {
      *
      * @param nummer the account number for which to retrieve the balance
      * @return the current account balance
-     * @throws KontonummerNichtVorhandenException if the account number does not exist
+     * @throws KontonummerDoesNotExistException if the account number does not exist
      */
-    public double getKontostand(long nummer) throws KontonummerNichtVorhandenException {
+    public double getKontostand(long nummer) throws KontonummerDoesNotExistException {
         validiereKonto(nummer);
         return kontoMap.get(nummer).getKontostand();
     }

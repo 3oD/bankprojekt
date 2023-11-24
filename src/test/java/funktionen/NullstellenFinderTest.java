@@ -10,24 +10,32 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class NullstellenFinderTest {
 
     @Test
-    void testenNullstelle() {
+    void testFindNullstelle() {
         DoubleFunction<Double> f = x -> Math.pow(x, 2) - 25;
-        assertEquals(5, NullstellenFinder.suchenNullstelle(f, 0.0,10.0), 0.01);
+        assertEquals(5, NullstellenFinder.findNullstelle(f, -1.0,10.0), 0.01);
 
         DoubleFunction<Double> g = x -> Math.exp(3*x) - 7;
-        assertEquals(0.648, NullstellenFinder.suchenNullstelle(g, 0.0,5.0), 0.01);
+        assertEquals(0.648, NullstellenFinder.findNullstelle(g, -0.5,5.0), 0.01);
 
         DoubleFunction<Double> h = x -> Math.sin(Math.pow(x, 2)) - 0.5;
-        assertEquals(0.723, NullstellenFinder.suchenNullstelle(h, 0.0,2.0), 0.01);
+        assertEquals(-0.723, NullstellenFinder.findNullstelle(h, -1.0,2.0), 0.01);
 
         DoubleFunction<Double> i = x -> -(Math.pow(x,2)) + 31;
-        assertEquals(5.567, NullstellenFinder.suchenNullstelle(i,0d,7d),0.01);
+        assertEquals(5.567, NullstellenFinder.findNullstelle(i,-5d,7d),0.01);
 
-        DoubleFunction<Double> k = x -> Math.pow(x, 2) + 1;
         try {
-            NullstellenFinder.suchenNullstelle(k, -5.0, 5.0);
+            NullstellenFinder.findNullstelle(f, -2.0, 5.0);
         } catch (IllegalArgumentException e) {
             assertEquals("Die Funktion hat in dem gegebenen Intervall keine Nullstelle.", e.getMessage());
         }
+    }
+
+    @Test
+    void testFindNullstelleInvalidIntervall() {
+        DoubleFunction<Double> f = (double x) -> x + 1;
+        assertThrows(IllegalArgumentException.class, () -> NullstellenFinder.findNullstelle(f, Double.NaN, 0.0));
+        assertThrows(IllegalArgumentException.class, () -> NullstellenFinder.findNullstelle(f, 0.0, Double.NaN));
+        assertThrows(IllegalArgumentException.class, () -> NullstellenFinder.findNullstelle(f, Double.POSITIVE_INFINITY, 0.0));
+        assertThrows(IllegalArgumentException.class, () -> NullstellenFinder.findNullstelle(f, 0.0, Double.POSITIVE_INFINITY));
     }
 }

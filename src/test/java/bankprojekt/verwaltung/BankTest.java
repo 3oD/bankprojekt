@@ -16,7 +16,7 @@ class BankTest {
     long kontoNummer1, kontoNummer2, kontoNummer3;
 
     @BeforeEach
-    void setup() throws KontonummerNichtVorhandenException, GesperrtException {
+    void setup() throws KontonummerDoesNotExistException, GesperrtException {
         b1 = new Bank(12312L);
         b2 = new Bank(145351L);
 
@@ -39,7 +39,7 @@ class BankTest {
     // TODO: Test getKontostand inkl. Exception
 
     @Test
-    void testGeldEinzahlen() throws KontonummerNichtVorhandenException {
+    void testGeldEinzahlen() throws KontonummerDoesNotExistException {
         b1.geldEinzahlen(kontoNummer1, 500);
 
         assertEquals(1000, b1.getKontostand(kontoNummer1));
@@ -47,7 +47,7 @@ class BankTest {
 
     @Test
     void testGeldEinzahlenKontonummerNichtVorhanden() {
-        Assertions.assertThrowsExactly(KontonummerNichtVorhandenException.class, () -> b1.geldEinzahlen(8521464L, 1000));
+        Assertions.assertThrowsExactly(KontonummerDoesNotExistException.class, () -> b1.geldEinzahlen(8521464L, 1000));
     }
 
     @Test
@@ -60,7 +60,7 @@ class BankTest {
     }
 
     @Test
-    void testGeldAbheben() throws GesperrtException, KontonummerNichtVorhandenException {
+    void testGeldAbheben() throws GesperrtException, KontonummerDoesNotExistException {
         assertTrue(b1.geldAbheben(kontoNummer1, 100));
         assertEquals(400, b1.getKontostand(kontoNummer1));
         assertTrue(b1.geldAbheben(kontoNummer2, 100));
@@ -71,7 +71,7 @@ class BankTest {
 
     @Test
     void testGeldAbhebenKontonummerNichtVorhanden() {
-        Assertions.assertThrowsExactly(KontonummerNichtVorhandenException.class, () -> b1.geldAbheben(8521464L, 1000));
+        Assertions.assertThrowsExactly(KontonummerDoesNotExistException.class, () -> b1.geldAbheben(8521464L, 1000));
     }
 
     @Test
@@ -100,11 +100,11 @@ class BankTest {
 
     @Test
     void testKontoNichtVorhanden() {
-        Assertions.assertThrowsExactly(KontonummerNichtVorhandenException.class, () -> b1.geldEinzahlen(156846L, 33.6));
+        Assertions.assertThrowsExactly(KontonummerDoesNotExistException.class, () -> b1.geldEinzahlen(156846L, 33.6));
     }
 
     @Test
-    void testGeldUeberweisen() throws KontonummerNichtVorhandenException {
+    void testGeldUeberweisen() throws KontonummerDoesNotExistException {
         b1.geldUeberweisen(kontoNummer1, kontoNummer2, 100, "Test");
         assertEquals(100, b1.getKontostand(kontoNummer2));
         assertEquals(400, b1.getKontostand(kontoNummer1));
@@ -128,7 +128,7 @@ class BankTest {
     }
 
     @Test
-    void testGetAlleKonten() throws KontonummerNichtVorhandenException {
+    void testGetAlleKonten() throws KontonummerDoesNotExistException {
         String exprectedString = "------------------------------" + System.lineSeparator() +
                 "Liste aller Konten:" + System.lineSeparator() +
                 "Kontonummer: " + b1.getAlleKontonummern().get(0) + ", Kontostand: " + b1.getKontostand(b1.getAlleKontonummern().get(0)) + " EUR" + System.lineSeparator() +
