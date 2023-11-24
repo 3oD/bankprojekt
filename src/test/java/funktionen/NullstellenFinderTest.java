@@ -24,7 +24,7 @@ class NullstellenFinderTest {
         assertEquals(5.567, NullstellenFinder.findNullstelle(i,-5d,7d),0.01);
 
         try {
-            NullstellenFinder.findNullstelle(f, -2.0, 5.0);
+            NullstellenFinder.findNullstelle(g, -28.0, 544.0);
         } catch (IllegalArgumentException e) {
             assertEquals("Die Funktion hat in dem gegebenen Intervall keine Nullstelle.", e.getMessage());
         }
