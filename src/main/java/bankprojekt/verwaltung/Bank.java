@@ -137,11 +137,10 @@ public class Bank {
     }
 
     /**
-     * Validates a bank account with the given account number.
+     * Validates the existence of a specified bank account number.
      *
-     * @param nummer the account number to be validated
-     * @throws KontonummerDoesNotExistException if the account number does not exist
-     * @throws IllegalArgumentException           if the account number is invalid
+     * @param nummer the bank account number to be validated
+     * @throws KontonummerDoesNotExistException if the bank account number does not exist
      */
     private void validiereKonto(long nummer) throws KontonummerDoesNotExistException {
         if (!kontoMap.containsKey(nummer)) {
@@ -341,8 +340,8 @@ public class Bank {
     public List<Long> getKontonummernLuecken() {
         long upperBound = kontonummerZaehler - 1; // current highest account number
         return LongStream.rangeClosed(MINIMUM_KONTONUMMER, upperBound)
-                .boxed() // convert to Stream<Long>
-                .filter(num -> !kontoMap.containsKey(num)) // filter out keys that are in use
+                .boxed()
+                .filter(num -> !kontoMap.containsKey(num))
                 .toList();
     }
 

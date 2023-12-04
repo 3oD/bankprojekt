@@ -5,10 +5,6 @@ import java.util.function.DoubleFunction;
 
 public class NullstellenFinder {
 
-    private NullstellenFinder(){
-        throw new IllegalStateException("Utility Class!");
-    }
-
     public static Double findNullstelle(DoubleFunction<Double> funktion, Double a, Double b) {
         if (a.isInfinite()||a.isNaN()||b.isInfinite()||b.isNaN()){
             throw new IllegalArgumentException("Invalid input: a or b is infinite or NaN");
