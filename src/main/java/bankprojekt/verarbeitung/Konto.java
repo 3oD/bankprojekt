@@ -2,6 +2,9 @@ package bankprojekt.verarbeitung;
 
 import com.google.common.primitives.Doubles;
 
+import java.util.Map;
+import java.util.concurrent.*;
+
 /**
  * stellt ein allgemeines Bank-Konto dar
  */
@@ -40,6 +43,14 @@ public abstract class Konto implements Comparable<Konto> {
      * die zum Schaden des Kontoinhabers wären (abheben, Inhaberwechsel)
      */
     private boolean gesperrt;
+
+    /**
+     * Depot is a private ConcurrentHashMap that represents the stock portfolio of an account.
+     * The keys in the map are Aktie objects, which represent individual stocks, and the values are
+     * integers representing the quantity of each stock in the portfolio.
+     */
+    private ConcurrentHashMap<Aktie, Integer> depot = new ConcurrentHashMap<>();
+    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
 
     /**
      * Constructs a new Konto object with the specified owner and account number.
@@ -272,4 +283,77 @@ public abstract class Konto implements Comparable<Konto> {
         this.waehrung = neu;
     }
 
+    /**
+     * Executes a buying order for a given stock.
+     *
+     * @param aktie     The stock for the buying order.
+     * @param anzahl    The quantity of stocks to buy.
+     * @*/
+    public Future<Double> kaufauftrag(Aktie aktie, int anzahl, double maxPreis) {
+        return executorService.submit(() -> {
+            double kurs = aktie.getKurs();
+            while (kurs > maxPreis) {
+                aktie.awaitKursChange();
+                kurs = aktie.getKurs();
+            }
+            double kosten = kurs * anzahl;
+            synchronized (this) {
+                if (kontostand >= kosten) {
+                    kontostand -= kosten;
+                    depot.put(aktie, depot.getOrDefault(aktie, 0) + anzahl);
+                    System.out.println("Kaufauftrag für " + aktie.getName() + " (" + aktie.getWertpapierNr() + ") ausgeführt."  + " gekauft bei: " + aktie.getKurs());
+                } else {
+                    kosten = 0;
+                }
+            }
+            return kosten;
+        });
+    }
+
+    public Future<Double> verkaufauftrag(String wertpapierNr, double minimalpreis) {
+        return executorService.submit(() -> {
+            double gesamtErtrag = 0;
+            for (Map.Entry<Aktie, Integer> entry : depot.entrySet()) {
+                Aktie aktie = entry.getKey();
+                Integer anzahl = entry.getValue();
+
+                while (anzahl == 0) {
+                    try {
+                        aktie.awaitAktieExists();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                if (aktie.getWertpapierNr().equals(wertpapierNr)) {
+                    while (anzahl > 0 && aktie.getKurs() < minimalpreis) {
+                        try {
+                            aktie.awaitKursChange();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    synchronized (this) {
+                        double kurs = aktie.getKurs();
+                        double ertrag = kurs * anzahl;
+                        gesamtErtrag += ertrag;
+                        kontostand += ertrag;
+                        depot.remove(aktie);
+                        System.out.println("Verkaufsauftrag für " + aktie.getName() + " (" + aktie.getWertpapierNr() + ") wurde ausgeführt. Kontostand: " + kontostand);
+                    }
+                }
+            }
+            return gesamtErtrag;
+        });
+    }
+
+    public void getDepot() {
+        for (Map.Entry<Aktie, Integer> entry : depot.entrySet()) {
+            Aktie aktie = entry.getKey();
+            Integer anzahl = entry.getValue();
+
+            System.out.println("Aktie: " + aktie.getName() + " (" + aktie.getWertpapierNr() + ") Anzahl: " + anzahl);
+        }
+    }
 }
