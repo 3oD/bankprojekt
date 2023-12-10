@@ -308,10 +308,15 @@ public class Bank {
     /**
      * Retrieves a list of customers with a bank account balance equal to or greater than the specified minimum amount.
      *
-     * @param minimum the minimum account balance
-     * @return a list of customers with a bank account balance equal to or greater than the minimum
+     * @param minimum the minimum balance to filter by
+     * @return a list of customers with a balance equal to or greater than the minimum amount
+     * @throws IllegalArgumentException if the minimum amount is NaN or infinite
      */
     public List<Kunde> getKundenMitVollemKonto(double minimum) {
+        if (Double.isNaN(minimum)|| Double.isInfinite(minimum)){
+            throw new IllegalArgumentException("Unguelitge Einfage von minimum");
+        }
+
         return kontoMap.values().stream()
                 .filter(konto -> konto.getKontostand() >= minimum)
                 .map(Konto::getInhaber)
@@ -338,11 +343,34 @@ public class Bank {
      * @return a list of account numbers with gaps
      */
     public List<Long> getKontonummernLuecken() {
-        long upperBound = kontonummerZaehler - 1; // current highest account number
+        long upperBound = kontonummerZaehler - 1;
         return LongStream.rangeClosed(MINIMUM_KONTONUMMER, upperBound)
                 .boxed()
                 .filter(num -> !kontoMap.containsKey(num))
                 .toList();
     }
 
+    /**
+     * Retrieves a list of customers with a bank account balance equal to or greater than the specified minimum amount.
+     *
+     * @param minimum the minimum balance to filter by
+     * @return a list of customers with a balance equal to or greater than the minimum amount
+     * @throws IllegalArgumentException if the minimum amount is NaN or infinite
+     */
+    public List<Kunde> getAlleReichenKunden(double minimum) {
+        if (Double.isNaN(minimum) || Double.isInfinite(minimum)) {
+            throw new IllegalArgumentException("Invalid minimum value");
+        }
+
+        return kontoMap.values().stream()
+                .collect(Collectors.groupingBy(Konto::getInhaber))
+                .entrySet().stream()
+                .map(e -> new AbstractMap.SimpleEntry<>(e.getKey(),
+                        e.getValue().stream()
+                                .mapToDouble(Konto::getKontostand)
+                                .sum()))
+                .filter(e -> e.getValue() > minimum)
+                .map(Map.Entry::getKey)
+                .toList();
+    }
 }

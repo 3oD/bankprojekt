@@ -329,4 +329,41 @@ class BankMockingTest {
         Assertions.assertEquals(1, result.size());
         Assertions.assertEquals(result.get(0), kunde1);
     }
+
+    @Test
+    void testGetAlleReichenKunden() {
+        Kunde mockCustomer1 = mock(Kunde.class);
+        Kunde mockCustomer2 = mock(Kunde.class);
+        Kunde mockCustomer3 = mock(Kunde.class);
+
+        Konto mockKonto1 = mock(Konto.class);
+        Konto mockKonto2 = mock(Konto.class);
+        Konto mockKonto3 = mock(Konto.class);
+
+        when(mockKonto1.getInhaber()).thenReturn(mockCustomer1);
+        when(mockKonto2.getInhaber()).thenReturn(mockCustomer2);
+        when(mockKonto3.getInhaber()).thenReturn(mockCustomer3);
+
+        when(mockKonto1.getKontostand()).thenReturn(1500.0);
+        when(mockKonto2.getKontostand()).thenReturn(2500.0);
+        when(mockKonto3.getKontostand()).thenReturn(3500.0);
+
+        bank.mockEinfuegen(mockKonto1);
+        bank.mockEinfuegen(mockKonto2);
+        bank.mockEinfuegen(mockKonto3);
+
+        List<Kunde> reicheKunden = bank.getAlleReichenKunden(2000);
+
+        assertEquals(2, reicheKunden.size());
+
+        assertFalse(reicheKunden.contains(mockCustomer1));
+        assertTrue(reicheKunden.contains(mockCustomer2));
+        assertTrue(reicheKunden.contains(mockCustomer3));
+    }
+
+    @Test
+    void testGetAlleReichenKundenExtremfaelle() {
+        assertThrows(IllegalArgumentException.class, () -> bank.getAlleReichenKunden(Double.POSITIVE_INFINITY));
+        assertThrows(IllegalArgumentException.class, () -> bank.getAlleReichenKunden(Double.NaN));
+    }
 }

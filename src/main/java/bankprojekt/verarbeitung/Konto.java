@@ -30,15 +30,6 @@ public abstract class Konto implements Comparable<Konto> {
     private Waehrung waehrung = Waehrung.EUR;
 
     /**
-     * setzt den aktuellen Kontostand
-     *
-     * @param kontostand neuer Kontostand
-     */
-    protected void setKontostand(double kontostand) {
-        this.kontostand = kontostand;
-    }
-
-    /**
      * Wenn das Konto gesperrt ist (gesperrt = true), können keine Aktionen daran mehr vorgenommen werden,
      * die zum Schaden des Kontoinhabers wären (abheben, Inhaberwechsel)
      */
@@ -49,9 +40,14 @@ public abstract class Konto implements Comparable<Konto> {
      * The keys in the map are Aktie objects, which represent individual stocks, and the values are
      * integers representing the quantity of each stock in the portfolio.
      */
-    private ConcurrentHashMap<Aktie, Integer> depot = new ConcurrentHashMap<>();
-    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
+    private final ConcurrentHashMap<Aktie, Integer> depot = new ConcurrentHashMap<>();
 
+    /**
+     * An ExecutorService that manages a fixed thread pool of size 10.
+     *
+     * @see Executors#newFixedThreadPool(int)
+     */
+    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
     /**
      * Constructs a new Konto object with the specified owner and account number.
      *
@@ -101,6 +97,15 @@ public abstract class Konto implements Comparable<Konto> {
      */
     public final double getKontostand() {
         return kontostand;
+    }
+
+    /**
+     * setzt den aktuellen Kontostand
+     *
+     * @param kontostand neuer Kontostand
+     */
+    protected void setKontostand(double kontostand) {
+        this.kontostand = kontostand;
     }
 
     /**
@@ -284,20 +289,23 @@ public abstract class Konto implements Comparable<Konto> {
     }
 
     /**
-     * Executes a buying order for a given stock.
+     * Executes a buy order for the specified stock at the maximum price.
      *
-     * @param aktie     The stock for the buying order.
-     * @param anzahl    The quantity of stocks to buy.
-     * @*/
+     * @param aktie      the stock to buy
+     * @param anzahl     the number of stocks to buy
+     * @param maxPreis   the maximum price to buy the stocks at
+     * @return a Future representing the cost of the buy order, or 0 if the account balance is insufficient
+     */
     public Future<Double> kaufauftrag(Aktie aktie, int anzahl, double maxPreis) {
         return executorService.submit(() -> {
-            double kurs = aktie.getKurs();
-            while (kurs > maxPreis) {
-                aktie.awaitKursChange();
-                kurs = aktie.getKurs();
-            }
-            double kosten = kurs * anzahl;
+            double kosten;
             synchronized (this) {
+                double kurs = aktie.getKurs();
+                while (kurs > maxPreis) {
+                    aktie.awaitKursChange();
+                    kurs = aktie.getKurs();
+                }
+                kosten = kurs * anzahl;
                 if (kontostand >= kosten) {
                     kontostand -= kosten;
                     depot.put(aktie, depot.getOrDefault(aktie, 0) + anzahl);
@@ -310,50 +318,37 @@ public abstract class Konto implements Comparable<Konto> {
         });
     }
 
+    /**
+     * Executes a selling order for stocks with a given security number and minimum price.
+     *
+     * @param wertpapierNr The security number of the stocks to sell.
+     * @param minimalpreis The minimum price required for selling the stocks.
+     * @return A future representing the total profit from the selling order.
+     */
     public Future<Double> verkaufauftrag(String wertpapierNr, double minimalpreis) {
         return executorService.submit(() -> {
             double gesamtErtrag = 0;
-            for (Map.Entry<Aktie, Integer> entry : depot.entrySet()) {
-                Aktie aktie = entry.getKey();
-                Integer anzahl = entry.getValue();
+            synchronized (this) {
+                for (Map.Entry<Aktie, Integer> entry : depot.entrySet()) {
+                    Aktie aktie = entry.getKey();
+                    Integer anzahl = entry.getValue();
 
-                while (anzahl == 0) {
-                    try {
-                        aktie.awaitAktieExists();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
+                    if (aktie.getWertpapierNr().equals(wertpapierNr) && anzahl > 0) {
+                        double aktienKurs = aktie.getKurs();
 
-                if (aktie.getWertpapierNr().equals(wertpapierNr)) {
-                    while (anzahl > 0 && aktie.getKurs() < minimalpreis) {
-                        try {
+                        while (aktienKurs < minimalpreis) {
                             aktie.awaitKursChange();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
+                            aktienKurs = aktie.getKurs();
                         }
-                    }
-
-                    synchronized (this) {
-                        double kurs = aktie.getKurs();
-                        double ertrag = kurs * anzahl;
-                        gesamtErtrag += ertrag;
-                        kontostand += ertrag;
-                        depot.remove(aktie);
-                        System.out.println("Verkaufsauftrag für " + aktie.getName() + " (" + aktie.getWertpapierNr() + ") wurde ausgeführt. Kontostand: " + kontostand);
+                            double ertrag = aktienKurs * anzahl;
+                            kontostand += ertrag;
+                            depot.remove(aktie);
+                            gesamtErtrag += ertrag;
+                            System.out.println("Verkaufsauftrag für " + aktie.getName() + " (" + aktie.getWertpapierNr() + ") wurde ausgeführt. Kontostand: " + kontostand);
                     }
                 }
             }
             return gesamtErtrag;
         });
-    }
-
-    public void getDepot() {
-        for (Map.Entry<Aktie, Integer> entry : depot.entrySet()) {
-            Aktie aktie = entry.getKey();
-            Integer anzahl = entry.getValue();
-
-            System.out.println("Aktie: " + aktie.getName() + " (" + aktie.getWertpapierNr() + ") Anzahl: " + anzahl);
-        }
     }
 }
