@@ -2,13 +2,14 @@ package bankprojekt.verarbeitung;
 
 import com.google.common.primitives.Doubles;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.*;
 
 /**
  * stellt ein allgemeines Bank-Konto dar
  */
-public abstract class Konto implements Comparable<Konto> {
+public abstract class Konto implements Comparable<Konto>, Serializable {
     /**
      * der Kontoinhaber
      */

@@ -23,7 +23,6 @@ public class Aktie {
     private final Lock lock = new ReentrantLock();
     private final Condition kursChanged = lock.newCondition();
     private final AtomicReference<Double> kurs = new AtomicReference<>();
-    private static final Logger logger = Logger.getLogger(Aktie.class.getName());
 
     private static final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(0);
 
@@ -72,9 +71,6 @@ public class Aktie {
                 double percentChange = ThreadLocalRandom.current().nextDouble(-3, 3);
                 this.kurs.set(this.kurs.get() + this.kurs.get() * percentChange / 100);
                 kursChanged.signalAll();
-
-                // Logging des aktuellen Kurses
-                logger.info(String.format("Aktueller Kurswert für %s (%s): %.2f", name, wertpapierNr, this.kurs.get()));
             } finally {
                 lock.unlock();
             }
@@ -125,6 +121,5 @@ public class Aktie {
      */
     public void shutdown() {
         executorService.shutdownNow();
-        logger.info("#####  " + name + "(" + wertpapierNr + ") wurde beendet  #####");
     }
 }
