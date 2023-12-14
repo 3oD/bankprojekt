@@ -12,6 +12,7 @@ public class AktienSpielereien {
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private static final String BLUE_START = "\u001B[34m";
     private static final String GREEN_START = "\u001B[32m";
+    private static final String WHITE_START = "\u001B[37m";
     private static final String COLOR_END = "\u001B[0m";
 
     public static void main(String[] args) throws Exception {
@@ -49,14 +50,14 @@ public class AktienSpielereien {
         LOGGER.info(BLUE_START + "Aktie: " + "Verkaufspreis von MSFT: " + verkauf3.get() + COLOR_END);
 
 
-        System.out.printf("Gesamtkaufpreis für Google-Aktien: %.2f%n", kauf1.get());
-        System.out.printf("Gesamtkaufpreis für Apple-Aktien: %.2f%n", kauf2.get());
-        System.out.printf("Gesamtkaufpreis für Microsoft-Aktien: %.2f%n", kauf3.get());
-        System.out.printf("Gesamteinnahmen aus dem Verkauf von Google-Aktien: %.2f%n", verkauf1.get());
-        System.out.printf("Gesamteinnahmen aus dem Verkauf von Apple-Aktien: %.2f%n", verkauf2.get());
-        System.out.printf("Gesamtergebnisse aus dem Verkauf von Microsoft-Aktien: %.2f%n", verkauf3.get());
+        LOGGER.info(WHITE_START + String.format("Gesamtkaufpreis für Google-Aktien: %.2f%n", kauf1.get()) + COLOR_END);
+        LOGGER.info(WHITE_START + String.format("Gesamtkaufpreis für Apple-Aktien: %.2f%n", kauf2.get()) + COLOR_END);
+        LOGGER.info(WHITE_START + String.format("Gesamtkaufpreis für Microsoft-Aktien: %.2f%n", kauf3.get()) + COLOR_END);
+        LOGGER.info(WHITE_START + String.format("Gesamteinnahmen aus dem Verkauf von Google-Aktien: %.2f%n", verkauf1.get()) + COLOR_END);
+        LOGGER.info(WHITE_START + String.format("Gesamteinnahmen aus dem Verkauf von Apple-Aktien: %.2f%n", verkauf2.get()) + COLOR_END);
+        LOGGER.info(WHITE_START + String.format("Gesamteinnahmen aus dem Verkauf von Microsoft-Aktien: %.2f%n", verkauf3.get()) + COLOR_END);
 
-        System.out.println("Alle Aufträge abgeschlossen");
+        LOGGER.info(WHITE_START + "Alle Aufträge abgeschlossen" + COLOR_END);
         microsoft.shutdown();
         LOGGER.info("#####  " + microsoft.getName() + "(" + microsoft.getWertpapierNr() + ") wurde beendet  #####");
         apple.shutdown();

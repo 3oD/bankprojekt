@@ -48,7 +48,7 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
      *
      * @see Executors#newFixedThreadPool(int)
      */
-    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
+    private static final ExecutorService executorService = Executors.newFixedThreadPool(10);
     /**
      * Constructs a new Konto object with the specified owner and account number.
      *
@@ -310,7 +310,6 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
                 if (kontostand >= kosten) {
                     kontostand -= kosten;
                     depot.put(aktie, depot.getOrDefault(aktie, 0) + anzahl);
-                    System.out.println("Kaufauftrag für " + aktie.getName() + " (" + aktie.getWertpapierNr() + ") ausgeführt."  + " gekauft bei: " + aktie.getKurs());
                 } else {
                     kosten = 0;
                 }
@@ -345,7 +344,6 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
                             kontostand += ertrag;
                             depot.remove(aktie);
                             gesamtErtrag += ertrag;
-                            System.out.println("Verkaufsauftrag für " + aktie.getName() + " (" + aktie.getWertpapierNr() + ") wurde ausgeführt. Kontostand: " + kontostand);
                     }
                 }
             }
