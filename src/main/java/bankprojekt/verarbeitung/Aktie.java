@@ -113,10 +113,10 @@ public class Aktie {
 
     /**
      * Shuts down the Aktie instance.
-     *
+     * <br>
      * This method stops the execution of the Aktie instance by shutting down the executor service.
      * It also logs a shutdown message with the name and wertpapierNr of the Aktie.
-     *
+     * <p>
      * only implemented to stop AktienSpielereien automatically after all verkaufauftraege are done.
      */
     public void shutdown() {
