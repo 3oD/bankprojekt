@@ -2,6 +2,7 @@ package bankprojekt.verwaltung;
 
 import bankprojekt.verarbeitung.*;
 
+import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
@@ -10,7 +11,7 @@ import java.util.stream.LongStream;
  * The Bank class represents a bank with a given bank code (Bankleitzahl). It provides methods for creating accounts,
  * performing transactions, and retrieving account information.
  */
-public class Bank {
+public class Bank implements Cloneable, Serializable {
     private final long bankleitzahl;
     private final Map<Long, Konto> kontoMap = new HashMap<>();
     private long kontonummerZaehler = 10000000L;
@@ -46,6 +47,12 @@ public class Bank {
         }
         return kontonummer;
     }
+
+    /*
+     * ###############################################
+     * Methods for creating bank accounts
+     * ###############################################
+     */
 
     /**
      * Adds a new bank account to the bank's account map.
@@ -90,6 +97,13 @@ public class Bank {
         kontoMap.put(kontonummer, k);
         return kontonummer;
     }
+
+
+    /*
+     * ###############################################
+     * Methods for retrieving account information
+     * ###############################################
+     */
 
     /**
      * Retrieves a string representation of all bank accounts in the bank.
@@ -137,6 +151,94 @@ public class Bank {
     }
 
     /**
+     * Retrieves the current account balance for the specified account number.
+     *
+     * @param nummer the account number for which to retrieve the balance
+     * @return the current account balance
+     * @throws KontonummerDoesNotExistException if the account number does not exist
+     */
+    public double getKontostand(long nummer) throws KontonummerDoesNotExistException {
+        validiereKonto(nummer);
+        return kontoMap.get(nummer).getKontostand();
+    }
+
+    /**
+     * Retrieves a list of customers with a bank account balance equal to or greater than the specified minimum amount.
+     *
+     * @param minimum the minimum balance to filter by
+     * @return a list of customers with a balance equal to or greater than the minimum amount
+     * @throws IllegalArgumentException if the minimum amount is NaN or infinite
+     */
+    public List<Kunde> getKundenMitVollemKonto(double minimum) {
+        if (Double.isNaN(minimum) || Double.isInfinite(minimum)) {
+            throw new IllegalArgumentException("Unguelitge Einfage von minimum");
+        }
+
+        return kontoMap.values().stream()
+                .filter(konto -> konto.getKontostand() >= minimum)
+                .map(Konto::getInhaber)
+                .toList();
+    }
+
+    /**
+     * Retrieves the name and addresses of all customers associated with bank accounts in this bank.
+     *
+     * @return a string containing the addresses of all customers, separated by a new line
+     */
+    public String getKundenadressen() {
+        return kontoMap.values().stream()
+                .map(Konto::getInhaber)
+                .distinct()
+                .sorted(Comparator.comparing(Kunde::getVorname))
+                .map(kunde -> kunde.getName() + ": " + kunde.getAdresse())
+                .collect(Collectors.joining(System.lineSeparator()));
+    }
+
+    /**
+     * Retrieves a list of account numbers with gaps in the range of existing account numbers.
+     *
+     * @return a list of account numbers with gaps
+     */
+    public List<Long> getKontonummernLuecken() {
+        long upperBound = kontonummerZaehler - 1;
+        return LongStream.rangeClosed(MINIMUM_KONTONUMMER, upperBound)
+                .boxed()
+                .filter(num -> !kontoMap.containsKey(num))
+                .toList();
+    }
+
+    /**
+     * Retrieves a list of customers with a bank account balance equal to or greater than the specified minimum amount.
+     *
+     * @param minimum the minimum balance to filter by
+     * @return a list of customers with a balance equal to or greater than the minimum amount
+     * @throws IllegalArgumentException if the minimum amount is NaN or infinite
+     */
+    public List<Kunde> getAlleReichenKunden(double minimum) {
+        if (Double.isNaN(minimum) || Double.isInfinite(minimum)) {
+            throw new IllegalArgumentException("Invalid minimum value");
+        }
+
+        return kontoMap.values().stream()
+                .collect(Collectors.groupingBy(Konto::getInhaber))
+                .entrySet().stream()
+                .map(e -> new AbstractMap.SimpleEntry<>(e.getKey(),
+                        e.getValue().stream()
+                                .mapToDouble(Konto::getKontostand)
+                                .sum()))
+                .filter(e -> e.getValue() > minimum)
+                .map(Map.Entry::getKey)
+                .toList();
+    }
+
+
+    /*
+     * ###############################################
+     * Methods for performing transactions
+     * ###############################################
+     */
+
+    /**
      * Validates the existence of a specified bank account number.
      *
      * @param nummer the bank account number to be validated
@@ -168,7 +270,7 @@ public class Bank {
      * @param betrag the amount of money to withdraw
      * @return true if the withdrawal was successful, false otherwise
      * @throws KontonummerDoesNotExistException if the account number does not exist
-     * @throws GesperrtException                  if the account is locked
+     * @throws GesperrtException                if the account is locked
      */
     public boolean geldAbheben(long nummer, double betrag) throws KontonummerDoesNotExistException, GesperrtException {
         validiereKonto(nummer);
@@ -201,18 +303,6 @@ public class Bank {
             return true;
         } else
             return false;
-    }
-
-    /**
-     * Retrieves the current account balance for the specified account number.
-     *
-     * @param nummer the account number for which to retrieve the balance
-     * @return the current account balance
-     * @throws KontonummerDoesNotExistException if the account number does not exist
-     */
-    public double getKontostand(long nummer) throws KontonummerDoesNotExistException {
-        validiereKonto(nummer);
-        return kontoMap.get(nummer).getKontostand();
     }
 
     /**
@@ -306,71 +396,29 @@ public class Bank {
     }
 
     /**
-     * Retrieves a list of customers with a bank account balance equal to or greater than the specified minimum amount.
+     * Creates a clone of the current Bank object.
      *
-     * @param minimum the minimum balance to filter by
-     * @return a list of customers with a balance equal to or greater than the minimum amount
-     * @throws IllegalArgumentException if the minimum amount is NaN or infinite
+     * @return a clone of the current Bank object
+     * @throws CloneNotSupportedException if cloning is not supported for the Bank object
      */
-    public List<Kunde> getKundenMitVollemKonto(double minimum) {
-        if (Double.isNaN(minimum)|| Double.isInfinite(minimum)){
-            throw new IllegalArgumentException("Unguelitge Einfage von minimum");
+    @Override
+    public Bank clone() throws CloneNotSupportedException {
+        byte[] byteData;
+
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
+             ObjectOutputStream oos = new ObjectOutputStream(bos)) {
+            oos.writeObject(this);
+            oos.flush();
+            byteData = bos.toByteArray();
+        } catch (IOException e) {
+            throw new CloneNotSupportedException("Bank could not be cloned");
         }
 
-        return kontoMap.values().stream()
-                .filter(konto -> konto.getKontostand() >= minimum)
-                .map(Konto::getInhaber)
-                .toList();
-    }
-
-    /**
-     * Retrieves the name and addresses of all customers associated with bank accounts in this bank.
-     *
-     * @return a string containing the addresses of all customers, separated by a new line
-     */
-    public String getKundenadressen() {
-        return kontoMap.values().stream()
-                .map(Konto::getInhaber)
-                .distinct()
-                .sorted(Comparator.comparing(Kunde::getVorname))
-                .map(kunde -> kunde.getName() + ": " + kunde.getAdresse())
-                .collect(Collectors.joining(System.lineSeparator()));
-    }
-
-    /**
-     * Retrieves a list of account numbers with gaps in the range of existing account numbers.
-     *
-     * @return a list of account numbers with gaps
-     */
-    public List<Long> getKontonummernLuecken() {
-        long upperBound = kontonummerZaehler - 1;
-        return LongStream.rangeClosed(MINIMUM_KONTONUMMER, upperBound)
-                .boxed()
-                .filter(num -> !kontoMap.containsKey(num))
-                .toList();
-    }
-
-    /**
-     * Retrieves a list of customers with a bank account balance equal to or greater than the specified minimum amount.
-     *
-     * @param minimum the minimum balance to filter by
-     * @return a list of customers with a balance equal to or greater than the minimum amount
-     * @throws IllegalArgumentException if the minimum amount is NaN or infinite
-     */
-    public List<Kunde> getAlleReichenKunden(double minimum) {
-        if (Double.isNaN(minimum) || Double.isInfinite(minimum)) {
-            throw new IllegalArgumentException("Invalid minimum value");
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(byteData);
+             ObjectInputStream ois = new ObjectInputStream(bais)) {
+            return (Bank) ois.readObject();
+        } catch (ClassNotFoundException | IOException e) {
+            throw new CloneNotSupportedException("Bank could not be cloned");
         }
-
-        return kontoMap.values().stream()
-                .collect(Collectors.groupingBy(Konto::getInhaber))
-                .entrySet().stream()
-                .map(e -> new AbstractMap.SimpleEntry<>(e.getKey(),
-                        e.getValue().stream()
-                                .mapToDouble(Konto::getKontostand)
-                                .sum()))
-                .filter(e -> e.getValue() > minimum)
-                .map(Map.Entry::getKey)
-                .toList();
     }
 }

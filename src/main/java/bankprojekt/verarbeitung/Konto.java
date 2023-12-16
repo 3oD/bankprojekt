@@ -48,7 +48,7 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
      *
      * @see Executors#newFixedThreadPool(int)
      */
-    private static final ExecutorService executorService = Executors.newFixedThreadPool(10);
+    private final transient ExecutorService executorService = Executors.newFixedThreadPool(10);
     /**
      * Constructs a new Konto object with the specified owner and account number.
      *

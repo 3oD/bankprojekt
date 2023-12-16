@@ -137,4 +137,23 @@ class BankTest {
                 "------------------------------";
         assertEquals(exprectedString, b1.getAlleKonten());
     }
+
+    @Test
+    void testClone() throws KontonummerDoesNotExistException, CloneNotSupportedException {
+        Bank originalBank = new Bank(12312L);
+        Kunde kunde1 = new Kunde("Max", "Mustermann", "Home", LocalDate.parse("2001-10-29"));
+        long kontoNummer1 = originalBank.girokontoErstellen(kunde1);
+        originalBank.geldEinzahlen(kontoNummer1, 500);
+
+        Bank clonedBank = originalBank.clone();
+
+        // Check if the cloned bank is equal to the original bank
+        assertEquals(originalBank.getKontostand(kontoNummer1), clonedBank.getKontostand(kontoNummer1));
+
+        // Deposit money into the original bank
+        originalBank.geldEinzahlen(kontoNummer1, 500);
+
+        // Check if the cloned bank remains unchanged
+        assertNotEquals(originalBank.getKontostand(kontoNummer1), clonedBank.getKontostand(kontoNummer1));
+    }
 }
