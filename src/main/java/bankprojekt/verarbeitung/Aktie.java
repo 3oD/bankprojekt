@@ -1,5 +1,6 @@
 package bankprojekt.verarbeitung;
 
+import java.io.Serializable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadLocalRandom;
@@ -17,11 +18,11 @@ import java.util.logging.Logger;
  * as well as an awaitKursChange() method to pause the execution until the price of the stock changes.
  * It also provides a shutdown() method to stop the periodic price updates.
  */
-public class Aktie {
+public class Aktie implements Serializable {
     private final String name;
     private final String wertpapierNr;
-    private final Lock lock = new ReentrantLock();
-    private final Condition kursChanged = lock.newCondition();
+    private static final Lock lock = new ReentrantLock();
+    private static final Condition kursChanged = lock.newCondition();
     private final AtomicReference<Double> kurs = new AtomicReference<>();
 
     private static final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(0);

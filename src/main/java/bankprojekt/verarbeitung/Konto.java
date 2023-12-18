@@ -2,6 +2,9 @@ package bankprojekt.verarbeitung;
 
 import com.google.common.primitives.Doubles;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -48,7 +51,7 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
      *
      * @see Executors#newFixedThreadPool(int)
      */
-    private final transient ExecutorService executorService = Executors.newFixedThreadPool(10);
+    private ExecutorService executorService = Executors.newFixedThreadPool(10);
     /**
      * Constructs a new Konto object with the specified owner and account number.
      *
@@ -349,5 +352,15 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
             }
             return gesamtErtrag;
         });
+    }
+
+    @Serial
+    private void readObject(ObjectInputStream in){
+        try {
+            in.defaultReadObject();
+            executorService = Executors.newFixedThreadPool(10);
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }

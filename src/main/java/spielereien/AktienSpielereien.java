@@ -34,16 +34,16 @@ public class AktienSpielereien {
         scheduler.scheduleAtFixedRate(getKurse, 0, 1, TimeUnit.SECONDS);
 
         Future<Double> kauf1 = konto.kaufauftrag(google, 10, 1900);
-        Future<Double> kauf2 = konto.kaufauftrag(apple, 3, 290);
-        Future<Double> kauf3 = konto.kaufauftrag(microsoft, 5, 240);
+        Future<Double> kauf2 = konto.kaufauftrag(apple, 3, 295);
+        Future<Double> kauf3 = konto.kaufauftrag(microsoft, 5, 245);
 
         LOGGER.info(GREEN_START + "Kaufpreis von GOOGL: " + kauf1.get() + COLOR_END);
         LOGGER.info(GREEN_START + "Kaufpreis von AAPL: " + kauf2.get() + COLOR_END);
         LOGGER.info(GREEN_START + "Kaufpreis von MSFT: " + kauf3.get() + COLOR_END);
 
         Future<Double> verkauf1 = konto.verkaufauftrag(google.getWertpapierNr(), 2100);
-        Future<Double> verkauf2 = konto.verkaufauftrag(apple.getWertpapierNr(), 310);
-        Future<Double> verkauf3 = konto.verkaufauftrag(microsoft.getWertpapierNr(), 260);
+        Future<Double> verkauf2 = konto.verkaufauftrag(apple.getWertpapierNr(), 305);
+        Future<Double> verkauf3 = konto.verkaufauftrag(microsoft.getWertpapierNr(), 255);
 
         LOGGER.info(BLUE_START + "Aktie: " + "Verkaufspreis von GOOGL: " + verkauf1.get() + COLOR_END);
         LOGGER.info(BLUE_START + "Aktie: " + "Verkaufspreis von AAPL: " + verkauf2.get() + COLOR_END);
