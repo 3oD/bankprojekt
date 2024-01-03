@@ -52,10 +52,11 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
      * @see Executors#newFixedThreadPool(int)
      */
     private ExecutorService executorService = Executors.newFixedThreadPool(10);
+
     /**
      * Constructs a new Konto object with the specified owner and account number.
      *
-     * @param inhaber The owner of the account
+     * @param inhaber     The owner of the account
      * @param kontonummer The account number
      */
     Konto(Kunde inhaber, long kontonummer) {
@@ -164,8 +165,29 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
      * @throws GesperrtException        wenn das Konto gesperrt ist
      * @throws IllegalArgumentException wenn der betrag negativ oder unendlich oder NaN ist
      */
-    public abstract boolean abheben(double betrag)
-            throws GesperrtException;
+    public boolean abheben(double betrag)
+            throws GesperrtException {
+        if (betrag < 0 || Double.isNaN(betrag) || Double.isInfinite(betrag)) {
+            throw new IllegalArgumentException("Betrag ungültig");
+        }
+        if (this.isGesperrt())
+            throw new GesperrtException(this.getKontonummer());
+        if (pruefeAbheben(betrag)) {
+            setKontostand(getKontostand() - betrag);
+            return true;
+        } else
+            return false;
+    }
+
+    /**
+     * Checks if a withdrawal of the specified amount is allowed based on the specific withdrawal rules
+     * for the account type.
+     * This method needs to be implemented by subclasses.
+     *
+     * @param betrag The amount to withdraw
+     * @return true if the withdrawal is allowed, false otherwise
+     */
+    protected abstract boolean pruefeAbheben(double betrag);
 
     /**
      * sperrt das Konto, Aktionen zum Schaden des Benutzers sind nicht mehr möglich.
@@ -295,9 +317,9 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
     /**
      * Executes a buy order for the specified stock at the maximum price.
      *
-     * @param aktie      the stock to buy
-     * @param anzahl     the number of stocks to buy
-     * @param maxPreis   the maximum price to buy the stocks at
+     * @param aktie    the stock to buy
+     * @param anzahl   the number of stocks to buy
+     * @param maxPreis the maximum price to buy the stocks at
      * @return a Future representing the cost of the buy order, or 0 if the account balance is insufficient
      */
     public Future<Double> kaufauftrag(Aktie aktie, int anzahl, double maxPreis) {
@@ -343,10 +365,10 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
                             aktie.awaitKursChange();
                             aktienKurs = aktie.getKurs();
                         }
-                            double ertrag = aktienKurs * anzahl;
-                            kontostand += ertrag;
-                            depot.remove(aktie);
-                            gesamtErtrag += ertrag;
+                        double ertrag = aktienKurs * anzahl;
+                        kontostand += ertrag;
+                        depot.remove(aktie);
+                        gesamtErtrag += ertrag;
                     }
                 }
             }
@@ -355,7 +377,7 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
     }
 
     @Serial
-    private void readObject(ObjectInputStream in){
+    private void readObject(ObjectInputStream in) {
         try {
             in.defaultReadObject();
             executorService = Executors.newFixedThreadPool(10);
