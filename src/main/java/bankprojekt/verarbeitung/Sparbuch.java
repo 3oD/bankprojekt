@@ -38,7 +38,7 @@ public class Sparbuch extends Konto {
     /**
      * ein Standard-Sparbuch
      */
-    public Sparbuch() throws GesperrtException {
+    public Sparbuch() {
         super();
         zinssatz = 0.03;
     }
@@ -50,7 +50,7 @@ public class Sparbuch extends Konto {
      * @param kontonummer die Wunsch-Kontonummer
      * @throws IllegalArgumentException wenn inhaber null ist
      */
-    public Sparbuch(Kunde inhaber, long kontonummer) throws GesperrtException {
+    public Sparbuch(Kunde inhaber, long kontonummer) {
         super(inhaber, kontonummer);
         zinssatz = 0.03;
     }
@@ -71,6 +71,7 @@ public class Sparbuch extends Konto {
                 + "Zinssatz: " + this.zinssatz * 100 + "%" + System.lineSeparator();
     }
 
+    // TODO Änderung von bereitsAbgehoben in eine andere Methode auslagern
     @Override
     protected boolean pruefeAbheben(double betrag) {
         LocalDate heute = LocalDate.now();
@@ -78,16 +79,20 @@ public class Sparbuch extends Konto {
             this.bereitsAbgehoben = 0;
         }
 
-        if (getKontostand() - betrag >= this.getAktuelleWaehrung().euroInWaehrungUmrechnen(Sparbuch.MIN_KONTOSTAND) &&
-                bereitsAbgehoben + betrag <= this.getAktuelleWaehrung().euroInWaehrungUmrechnen(Sparbuch.ABHEBESUMME)){
-            bereitsAbgehoben += betrag;
-            this.zeitpunkt = LocalDate.now();
-            return true;
-        } else {
-            return false;
-        }
+        return getKontostand() - betrag >= this.getAktuelleWaehrung().euroInWaehrungUmrechnen(Sparbuch.MIN_KONTOSTAND) &&
+                bereitsAbgehoben + betrag <= this.getAktuelleWaehrung().euroInWaehrungUmrechnen(Sparbuch.ABHEBESUMME);
     }
 
+    @Override
+    protected  void kontoAenderung(double betrag){
+        LocalDate heute = LocalDate.now();
+        if (heute.getMonth() != zeitpunkt.getMonth() || heute.getYear() != zeitpunkt.getYear()) {
+            this.bereitsAbgehoben = 0;
+        }
+
+        this.bereitsAbgehoben += betrag;
+        this.zeitpunkt = heute;
+    }
     /**
      * Konvertiert den Kontostand und den bereits abgehobenen Betrag in die neue Währung.
      * Ändert die Kontowährung in die neue Währung.

@@ -51,7 +51,7 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
      *
      * @see Executors#newFixedThreadPool(int)
      */
-    private ExecutorService executorService = Executors.newFixedThreadPool(10);
+    private transient ExecutorService executorService = Executors.newFixedThreadPool(10);
 
     /**
      * Constructs a new Konto object with the specified owner and account number.
@@ -174,6 +174,7 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
             throw new GesperrtException(this.getKontonummer());
         if (pruefeAbheben(betrag)) {
             setKontostand(getKontostand() - betrag);
+            kontoAenderung(betrag);
             return true;
         } else
             return false;
@@ -195,6 +196,11 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
     public final void sperren() {
         this.gesperrt = true;
     }
+
+    protected void kontoAenderung(double betrag) {
+    }
+
+    // TODO Abstract-Factory für Girokonto und Sparbuch
 
     /**
      * entsperrt das Konto, alle Kontoaktionen sind wieder möglich.

@@ -1,6 +1,7 @@
 package bankprojekt.verwaltung;
 
 import bankprojekt.verarbeitung.*;
+import bankprojekt.verarbeitung.factories.KontoFactory;
 
 import java.io.*;
 import java.util.*;
@@ -15,7 +16,6 @@ public class Bank implements Cloneable, Serializable {
     private final long bankleitzahl;
     private final Map<Long, Konto> kontoMap = new HashMap<>();
     private long kontonummerZaehler = 10000000L;
-    private static final double STANDARD_DISPO = 1000;
     private static final long MINIMUM_KONTONUMMER = 10000000L;
 
     /**
@@ -55,34 +55,15 @@ public class Bank implements Cloneable, Serializable {
      */
 
     /**
-     * Adds a new bank account to the bank's account map.
+     * Creates a new bank account using the given KontoFactory.
      *
-     * @param neuesKonto the new bank account to be added
-     * @return the account number of the newly created bank account
+     * @param factory the factory to create the account
+     * @return the account number of the newly created account
      */
-    private long kontoErstellen(Konto neuesKonto) {
+    public long kontoErstellen(KontoFactory factory, Kunde inhaber) {
+        Konto neuesKonto = factory.createKontoMitInhaber(inhaber, generiereEindeutigeKontonummer());
         kontoMap.put(neuesKonto.getKontonummer(), neuesKonto);
         return neuesKonto.getKontonummer();
-    }
-
-    /**
-     * Creates a new girokonto (checking account) for the specified owner.
-     *
-     * @param inhaber the owner of the girokonto
-     * @return the account number of the newly created girokonto
-     */
-    public long girokontoErstellen(Kunde inhaber) {
-        return kontoErstellen(new Girokonto(inhaber, generiereEindeutigeKontonummer(), STANDARD_DISPO));
-    }
-
-    /**
-     * Creates a new savings account for the specified owner.
-     *
-     * @param inhaber the owner of the savings account
-     * @return the account number of the newly created savings account
-     */
-    public long sparbuchErstellen(Kunde inhaber) throws GesperrtException {
-        return kontoErstellen(new Sparbuch(inhaber, generiereEindeutigeKontonummer()));
     }
 
     /**

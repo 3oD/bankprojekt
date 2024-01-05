@@ -2,6 +2,8 @@ package bankprojekt.verwaltung;
 
 import bankprojekt.verarbeitung.GesperrtException;
 import bankprojekt.verarbeitung.Kunde;
+import bankprojekt.verarbeitung.factories.GirokontoFactory;
+import bankprojekt.verarbeitung.factories.SparbuchFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,16 +18,16 @@ class BankTest {
     long kontoNummer1, kontoNummer2, kontoNummer3;
 
     @BeforeEach
-    void setup() throws KontonummerDoesNotExistException, GesperrtException {
+    void setup() throws KontonummerDoesNotExistException {
         b1 = new Bank(12312L);
         b2 = new Bank(145351L);
 
         kunde1 = new Kunde("Max", "Mustermann", "Home", LocalDate.parse("2001-10-29"));
         kunde2 = new Kunde("John", "Doe", "Work", LocalDate.parse("1985-07-12"));
 
-        kontoNummer1 = b1.girokontoErstellen(kunde1);
-        kontoNummer2 = b1.girokontoErstellen(kunde2);
-        kontoNummer3 = b1.sparbuchErstellen(kunde1);
+        kontoNummer1 = b1.kontoErstellen(new GirokontoFactory(), kunde1);
+        kontoNummer2 = b1.kontoErstellen(new GirokontoFactory(), kunde2);
+        kontoNummer3 = b1.kontoErstellen(new SparbuchFactory(), kunde1);
 
         b1.geldEinzahlen(kontoNummer1, 500);
     }
@@ -142,7 +144,7 @@ class BankTest {
     void testClone() throws KontonummerDoesNotExistException, CloneNotSupportedException {
         Bank originalBank = new Bank(12312L);
         Kunde kunde1 = new Kunde("Max", "Mustermann", "Home", LocalDate.parse("2001-10-29"));
-        long kontoNummer1 = originalBank.girokontoErstellen(kunde1);
+        long kontoNummer1 = originalBank.kontoErstellen(new GirokontoFactory(), kunde1);
         originalBank.geldEinzahlen(kontoNummer1, 500);
 
         Bank clonedBank = originalBank.clone();

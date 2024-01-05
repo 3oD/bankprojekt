@@ -18,7 +18,7 @@ public class Girokonto extends Konto implements Ueberweisungsfaehig {
      * erzeugt ein leeres, nicht gesperrtes Standard-Girokonto
      * von Max MUSTERMANN
      */
-    public Girokonto() throws GesperrtException {
+    public Girokonto() {
         super(Kunde.MUSTERMANN, 99887766);
         this.dispo = 500;
     }
