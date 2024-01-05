@@ -16,7 +16,7 @@ class KontoTest {
     Waehrung waehrungEUR = Waehrung.EUR;
 
     @BeforeEach
-    void setup() throws GesperrtException {
+    void setup() {
         kunde = new Kunde("Sebastian", "Gey", "hier", LocalDate.parse("1996-09-15"));
         girokonto = new Girokonto(kunde, 1234, 1000.0);
         sparbuch = new Sparbuch(kunde, 123456);
@@ -141,5 +141,33 @@ class KontoTest {
     void testAbhebenInFremdwaehrung() throws GesperrtException {
         assertTrue(girokonto.abheben(200, waehrungMKD));
         assertTrue(sparbuch.abheben(15, waehrungMKD));
+    }
+
+    /**
+     * Test of sperren method, of class Konto.
+     * Method: sperren()
+     */
+    @Test
+    public void testSperren() {
+        Konto instance = new Girokonto();
+        Assertions.assertFalse(instance.isGesperrt());
+
+        instance.sperren();
+
+        Assertions.assertTrue(instance.isGesperrt());
+    }
+
+    @Test
+    public void testEntsperren() {
+        Kunde kunde = new Kunde("Max", "Mustermann", "zuhause", LocalDate.parse("1990-01-01"));
+
+        Konto konto = new Sparbuch(kunde, 123456L);
+
+        konto.sperren();
+        assertTrue(konto.isGesperrt());
+
+        konto.entsperren();
+
+        assertFalse(konto.isGesperrt());
     }
 }

@@ -13,13 +13,14 @@ class GiroTest {
     Kunde kunde;
 
     @BeforeEach
-    void setup() throws GesperrtException {
+    void setup() {
         kunde = new Kunde("Sebastian", "Gey", "hier", LocalDate.parse("1996-09-15"));
 
         girokonto1 = new Girokonto();
         girokonto2 = new Girokonto(kunde, 65165161L, 1000);
     }
 
+    @SuppressWarnings("SpellCheckingInspection")
     @Test
     void testConstructorUngueltigerDispo() {
         Assertions.assertThrowsExactly(IllegalArgumentException.class,

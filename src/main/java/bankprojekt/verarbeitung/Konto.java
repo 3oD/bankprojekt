@@ -44,7 +44,7 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
      * The keys in the map are Aktie objects, which represent individual stocks, and the values are
      * integers representing the quantity of each stock in the portfolio.
      */
-    private final ConcurrentHashMap<Aktie, Integer> depot = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Aktie, Integer> depot = new ConcurrentHashMap<>();
 
     /**
      * An ExecutorService that manages a fixed thread pool of size 10.
@@ -156,14 +156,12 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
     }
 
     /**
-     * Mit dieser Methode wird der geforderte Betrag vom Konto abgehoben, wenn es nicht gesperrt ist
-     * und die speziellen Abheberegeln des jeweiligen Kontotyps die Abhebung erlauben
+     * Withdraws a specified amount from the account.
      *
-     * @param betrag double
-     * @return true, wenn die Abhebung geklappt hat,
-     * false, wenn sie abgelehnt wurde
-     * @throws GesperrtException        wenn das Konto gesperrt ist
-     * @throws IllegalArgumentException wenn der betrag negativ oder unendlich oder NaN ist
+     * @param betrag the amount to withdraw
+     * @return true if the withdrawal is successful, false otherwise
+     * @throws GesperrtException if the account is locked
+     * @throws IllegalArgumentException if the amount is invalid (negative, NaN, or infinite)
      */
     public boolean abheben(double betrag)
             throws GesperrtException {
@@ -197,10 +195,17 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
         this.gesperrt = true;
     }
 
+    /**
+     * Makes additional changes to the account based on the given amount. It is optional to implement this method.
+     * <p>
+     * These changes can be, for example, the deduction of fees or the updating of the amount already withdrawn
+     * in the current month. This method is called after the withdrawal has been successfully carried out.
+     * </p>
+     *
+     * @param betrag The amount with which the account was changed. The changes are carried out based on this amount.
+     */
     protected void kontoAenderung(double betrag) {
     }
-
-    // TODO Abstract-Factory für Girokonto und Sparbuch
 
     /**
      * entsperrt das Konto, alle Kontoaktionen sind wieder möglich.
@@ -387,6 +392,7 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
         try {
             in.defaultReadObject();
             executorService = Executors.newFixedThreadPool(10);
+            depot = new ConcurrentHashMap<>();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
