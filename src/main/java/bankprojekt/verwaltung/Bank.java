@@ -235,7 +235,7 @@ public class Bank implements Cloneable, Serializable {
      * Validates a specified amount to ensure it is a valid value.
      *
      * @param betrag the amount to be validated
-     * @throws IllegalArgumentException if the amount is less than or equal to 0, NaN, or infinite
+     * @throws IllegalArgumentException if the amount is less than or equal to Zero, NaN, or infinite
      */
     private void validiereBetrag(double betrag) {
 

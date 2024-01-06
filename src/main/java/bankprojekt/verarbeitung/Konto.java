@@ -163,7 +163,7 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
      * @throws GesperrtException if the account is locked
      * @throws IllegalArgumentException if the amount is invalid (negative, NaN, or infinite)
      */
-    public boolean abheben(double betrag)
+    public final boolean abheben(double betrag)
             throws GesperrtException {
         if (betrag < 0 || Double.isNaN(betrag) || Double.isInfinite(betrag)) {
             throw new IllegalArgumentException("Betrag ungültig");
@@ -189,13 +189,6 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
     protected abstract boolean pruefeAbheben(double betrag);
 
     /**
-     * sperrt das Konto, Aktionen zum Schaden des Benutzers sind nicht mehr möglich.
-     */
-    public final void sperren() {
-        this.gesperrt = true;
-    }
-
-    /**
      * Makes additional changes to the account based on the given amount. It is optional to implement this method.
      * <p>
      * These changes can be, for example, the deduction of fees or the updating of the amount already withdrawn
@@ -205,6 +198,13 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
      * @param betrag The amount with which the account was changed. The changes are carried out based on this amount.
      */
     protected void kontoAenderung(double betrag) {
+    }
+
+    /**
+     * sperrt das Konto, Aktionen zum Schaden des Benutzers sind nicht mehr möglich.
+     */
+    public final void sperren() {
+        this.gesperrt = true;
     }
 
     /**
@@ -281,7 +281,7 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
      * @param waehrung die Währung, in der der Betrag angegeben ist
      * @throws IllegalArgumentException wenn der Betrag negativ oder kein endlicher Wert ist
      */
-    public void einzahlen(double betrag, Waehrung waehrung) {
+    public final void einzahlen(double betrag, Waehrung waehrung) {
         double betragInEUR = waehrung.waehrungInEuroUmrechnen(betrag);
         double betragInKontoWaehrung = getAktuelleWaehrung().euroInWaehrungUmrechnen(betragInEUR);
 

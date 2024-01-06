@@ -71,20 +71,14 @@ public class Sparbuch extends Konto {
                 + "Zinssatz: " + this.zinssatz * 100 + "%" + System.lineSeparator();
     }
 
-    // TODO Änderung von bereitsAbgehoben in eine andere Methode auslagern
     @Override
     protected boolean pruefeAbheben(double betrag) {
-        LocalDate heute = LocalDate.now();
-        if (heute.getMonth() != zeitpunkt.getMonth() || heute.getYear() != zeitpunkt.getYear()) {
-            this.bereitsAbgehoben = 0;
-        }
-
         return getKontostand() - betrag >= this.getAktuelleWaehrung().euroInWaehrungUmrechnen(Sparbuch.MIN_KONTOSTAND) &&
                 bereitsAbgehoben + betrag <= this.getAktuelleWaehrung().euroInWaehrungUmrechnen(Sparbuch.ABHEBESUMME);
     }
 
     @Override
-    protected  void kontoAenderung(double betrag){
+    protected void kontoAenderung(double betrag) {
         LocalDate heute = LocalDate.now();
         if (heute.getMonth() != zeitpunkt.getMonth() || heute.getYear() != zeitpunkt.getYear()) {
             this.bereitsAbgehoben = 0;
@@ -93,6 +87,7 @@ public class Sparbuch extends Konto {
         this.bereitsAbgehoben += betrag;
         this.zeitpunkt = heute;
     }
+
     /**
      * Konvertiert den Kontostand und den bereits abgehobenen Betrag in die neue Währung.
      * Ändert die Kontowährung in die neue Währung.
@@ -108,12 +103,12 @@ public class Sparbuch extends Konto {
     }
 
     @Override
-    public boolean equals(Object other){
+    public boolean equals(Object other) {
         return super.equals(other);
     }
 
     @Override
-    public int hashCode(){
+    public int hashCode() {
         return super.hashCode();
     }
 
