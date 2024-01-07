@@ -13,6 +13,8 @@ import java.util.concurrent.*;
  * stellt ein allgemeines Bank-Konto dar
  */
 public abstract class Konto implements Comparable<Konto>, Serializable {
+    @Serial
+    private static final long serialVersionUID = 20240106L;
     /**
      * der Kontoinhaber
      */
