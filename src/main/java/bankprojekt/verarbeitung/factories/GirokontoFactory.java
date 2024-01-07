@@ -21,7 +21,7 @@ public class GirokontoFactory extends KontoFactory {
     private static final double STANDARD_DISPO = 1000;
 
     @Override
-    public Konto createKontoMitInhaber(Kunde inhaber, long kontonummer) {
+    public Konto createKonto(Kunde inhaber, long kontonummer) {
         return new Girokonto(inhaber, kontonummer, STANDARD_DISPO);
     }
 }

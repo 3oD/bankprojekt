@@ -10,5 +10,5 @@ public abstract class KontoFactory {
      * @param inhaber the owner of the Konto
      * @return a new Konto object
      */
-    public abstract Konto createKontoMitInhaber(Kunde inhaber,long nummer);
+    public abstract Konto createKonto(Kunde inhaber, long nummer);
 }

@@ -61,9 +61,10 @@ public class Bank implements Cloneable, Serializable {
      * @return the account number of the newly created account
      */
     public long kontoErstellen(KontoFactory factory, Kunde inhaber) {
-        Konto neuesKonto = factory.createKontoMitInhaber(inhaber, generiereEindeutigeKontonummer());
-        kontoMap.put(neuesKonto.getKontonummer(), neuesKonto);
-        return neuesKonto.getKontonummer();
+        long neueKontonummer = generiereEindeutigeKontonummer();
+        Konto neuesKonto = factory.createKonto(inhaber, neueKontonummer);
+        kontoMap.put(neueKontonummer, neuesKonto);
+        return neueKontonummer;
     }
 
     /**

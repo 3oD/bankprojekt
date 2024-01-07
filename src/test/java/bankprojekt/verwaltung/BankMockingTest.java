@@ -1,11 +1,17 @@
 package bankprojekt.verwaltung;
 
 import bankprojekt.verarbeitung.*;
+import bankprojekt.verarbeitung.factories.GirokontoFactory;
+import bankprojekt.verarbeitung.factories.KontoFactory;
+import bankprojekt.verarbeitung.factories.MockFactory;
+import bankprojekt.verarbeitung.factories.SparbuchFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 
 import java.util.List;
 
@@ -43,10 +49,9 @@ class BankMockingTest {
         when(empfaenger.getInhaber()).thenReturn(empfaengerKunde);
         when(kontoNichtUeberweisungsfaehig.getInhaber()).thenReturn(empfaengerKunde);
 
-        kontonummerSender = bank.mockEinfuegen(sender);
-        kontonummerEmpfaenger = bank.mockEinfuegen(empfaenger);
-        kontonummerEmpfaengerNichtUeberweisungsfaehig = bank.mockEinfuegen(kontoNichtUeberweisungsfaehig);
-
+        kontonummerSender = bank.kontoErstellen(new MockFactory(sender), senderKunde);
+        kontonummerEmpfaenger = bank.kontoErstellen(new MockFactory(empfaenger), empfaengerKunde);
+        kontonummerEmpfaengerNichtUeberweisungsfaehig = bank.kontoErstellen(new MockFactory(kontoNichtUeberweisungsfaehig), empfaengerKunde);
     }
 
     @Test
@@ -322,8 +327,8 @@ class BankMockingTest {
         when(konto1.getKontostand()).thenReturn(2000.0);
         when(konto2.getKontostand()).thenReturn(500.0);
 
-        bank.mockEinfuegen(konto1);
-        bank.mockEinfuegen(konto2);
+        bank.kontoErstellen(new MockFactory(konto1), kunde1);
+        bank.kontoErstellen(new MockFactory(konto2), kunde2);
 
         List<Kunde> result = bank.getKundenMitVollemKonto(1500);
         Assertions.assertEquals(1, result.size());
@@ -348,9 +353,9 @@ class BankMockingTest {
         when(mockKonto2.getKontostand()).thenReturn(2500.0);
         when(mockKonto3.getKontostand()).thenReturn(3500.0);
 
-        bank.mockEinfuegen(mockKonto1);
-        bank.mockEinfuegen(mockKonto2);
-        bank.mockEinfuegen(mockKonto3);
+        bank.kontoErstellen(new MockFactory(mockKonto1), mockCustomer1);
+        bank.kontoErstellen(new MockFactory(mockKonto2), mockCustomer2);
+        bank.kontoErstellen(new MockFactory(mockKonto3), mockCustomer3);
 
         List<Kunde> reicheKunden = bank.getAlleReichenKunden(2000);
 
