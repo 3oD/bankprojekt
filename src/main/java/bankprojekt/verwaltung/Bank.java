@@ -34,19 +34,6 @@ public class Bank implements Cloneable, Serializable {
         return bankleitzahl;
     }
 
-    /**
-     * Generates a unique account number.
-     *
-     * @return the generated unique account number
-     */
-    private synchronized long generiereEindeutigeKontonummer() {
-        long kontonummer = kontonummerZaehler++;
-
-        while (kontoMap.containsKey(kontonummer)) {
-            kontonummerZaehler++;
-        }
-        return kontonummer;
-    }
 
     /*
      * ###############################################
@@ -68,18 +55,18 @@ public class Bank implements Cloneable, Serializable {
     }
 
     /**
-     * Inserts a mock bank account into the bank's account map.
+     * Generates a unique account number.
      *
-     * @param k the bank account to be inserted
-     * @return the account number of the inserted bank account
+     * @return the generated unique account number
      */
-    public long mockEinfuegen(Konto k) {
-        long kontonummer = generiereEindeutigeKontonummer();
+    private synchronized long generiereEindeutigeKontonummer() {
+        long kontonummer = kontonummerZaehler++;
 
-        kontoMap.put(kontonummer, k);
+        while (kontoMap.containsKey(kontonummer)) {
+            kontonummerZaehler++;
+        }
         return kontonummer;
     }
-
 
     /*
      * ###############################################

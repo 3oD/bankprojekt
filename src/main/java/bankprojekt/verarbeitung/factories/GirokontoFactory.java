@@ -6,7 +6,6 @@ import bankprojekt.verarbeitung.Kunde;
 
 /**
  * A factory class for creating instances of {@link Girokonto}.
- *
  */
 public class GirokontoFactory extends KontoFactory {
     private static final double STANDARD_DISPO = 1000;
