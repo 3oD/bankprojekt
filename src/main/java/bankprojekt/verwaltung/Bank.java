@@ -46,6 +46,7 @@ public class Bank implements Cloneable, Serializable {
      *
      * @param factory the factory to create the account
      * @return the account number of the newly created account
+     * @throws IllegalArgumentException if the factory or the owner is null
      */
     public long kontoErstellen(KontoFactory factory, Kunde inhaber) {
         long neueKontonummer = generiereEindeutigeKontonummer();
