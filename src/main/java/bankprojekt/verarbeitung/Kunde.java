@@ -1,5 +1,8 @@
 package bankprojekt.verarbeitung;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -29,6 +32,8 @@ public class Kunde implements Comparable<Kunde>, Serializable {
      * englische oder deutsche Anrede, je nach den Systemeinstellungen
      */
     private static final String ANREDE;   //von der Idee her final, wegen der Verwendung des static-Blocks leider nicht möglich.
+
+    private final StringProperty adresseProperty = new SimpleStringProperty();
 
     /**
      * liefert die systemspezifische Anrede
@@ -141,6 +146,11 @@ public class Kunde implements Comparable<Kunde>, Serializable {
         if (adresse == null)
             throw new IllegalArgumentException("Adresse darf nicht null sein");
         this.adresse = adresse;
+        adresseProperty.set(adresse);
+    }
+
+    public StringProperty adresseProperty() {
+    	return adresseProperty;
     }
 
     /**

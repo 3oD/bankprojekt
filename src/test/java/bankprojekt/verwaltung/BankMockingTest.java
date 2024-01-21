@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
@@ -370,5 +371,14 @@ class BankMockingTest {
     void testGetAlleReichenKundenExtremfaelle() {
         assertThrows(IllegalArgumentException.class, () -> bank.getAlleReichenKunden(Double.POSITIVE_INFINITY));
         assertThrows(IllegalArgumentException.class, () -> bank.getAlleReichenKunden(Double.NaN));
+    }
+
+    @Test
+    void testEinzahlenTest(){
+        Mockito.doNothing().when(kb).aktualisieren(any(ArgumentMatchers.any()));
+        gk = new Girokonto();
+        gk.anmelden(kontoBeobachter);
+        gk.einzahlen(100);
+        Mockito.verify(kontoBeobachter).aktualisieren(gk);
     }
 }
