@@ -6,6 +6,7 @@ import bankprojekt.verarbeitung.factories.GirokontoFactory;
 import bankprojekt.verarbeitung.factories.SparbuchFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -149,13 +150,10 @@ class BankTest {
 
         Bank clonedBank = originalBank.clone();
 
-        // Check if the cloned bank is equal to the original bank
         assertEquals(originalBank.getKontostand(kontoNummer1), clonedBank.getKontostand(kontoNummer1));
 
-        // Deposit money into the original bank
         originalBank.geldEinzahlen(kontoNummer1, 500);
 
-        // Check if the cloned bank remains unchanged
         assertNotEquals(originalBank.getKontostand(kontoNummer1), clonedBank.getKontostand(kontoNummer1));
     }
 }

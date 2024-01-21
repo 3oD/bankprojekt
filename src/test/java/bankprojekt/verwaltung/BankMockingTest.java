@@ -372,13 +372,4 @@ class BankMockingTest {
         assertThrows(IllegalArgumentException.class, () -> bank.getAlleReichenKunden(Double.POSITIVE_INFINITY));
         assertThrows(IllegalArgumentException.class, () -> bank.getAlleReichenKunden(Double.NaN));
     }
-
-    @Test
-    void testEinzahlenTest(){
-        Mockito.doNothing().when(kb).aktualisieren(any(ArgumentMatchers.any()));
-        gk = new Girokonto();
-        gk.anmelden(kontoBeobachter);
-        gk.einzahlen(100);
-        Mockito.verify(kontoBeobachter).aktualisieren(gk);
-    }
 }

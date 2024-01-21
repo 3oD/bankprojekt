@@ -17,8 +17,8 @@ import java.util.concurrent.*;
  */
 public abstract class Konto implements Comparable<Konto>, Serializable {
     @Serial
-    private static final long serialVersionUID = 20240106L;
-    private final PropertyChangeSupport support = new PropertyChangeSupport(this);
+    private static final long serialVersionUID = 20240121L;
+    private transient PropertyChangeSupport support = new PropertyChangeSupport(this);
     /**
      * der Kontoinhaber
      */
@@ -32,7 +32,7 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
     /**
      * der aktuelle Kontostand
      */
-    private ReadOnlyDoubleWrapper kontostand;
+    private transient ReadOnlyDoubleWrapper kontostand;
 
     /**
      * die aktuelle Währung
@@ -43,7 +43,7 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
      * Wenn das Konto gesperrt ist (gesperrt = true), können keine Aktionen daran mehr vorgenommen werden,
      * die zum Schaden des Kontoinhabers wären (abheben, Inhaberwechsel)
      */
-    private BooleanProperty gesperrt;
+    private transient BooleanProperty gesperrt;
 
     /**
      * Depot is a private ConcurrentHashMap that represents the stock portfolio of an account.
@@ -58,7 +58,11 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
      * @see Executors#newFixedThreadPool(int)
      */
     private transient ExecutorService executorService = Executors.newFixedThreadPool(10);
-    private final BooleanProperty imPlus = new SimpleBooleanProperty();
+
+    /**
+     * Represents the read-only property that indicates whether the account balance is positive.
+     */
+    private final transient BooleanProperty kontostandPositiv = new SimpleBooleanProperty();
 
     /**
      * Constructs a new Konto object with the specified owner and account number.
@@ -69,10 +73,10 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
     Konto(Kunde inhaber, long kontonummer) {
         setInhaber(inhaber);
         this.nummer = kontonummer;
-        this.kontostand.set(0);
-        this.gesperrt.set(false);
+        this.kontostand = new ReadOnlyDoubleWrapper(0);
+        this.gesperrt = new SimpleBooleanProperty(false);
 
-        kontostand.addListener((observable, oldValue, newValue) -> imPlus.set(newValue.doubleValue() >= 0));
+        kontostand.addListener((observable, oldValue, newValue) -> kontostandPositiv.set(newValue.doubleValue() >= 0));
     }
 
     /**
@@ -122,6 +126,7 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
         double oldKontostand = this.kontostand.get();
         this.kontostand.set(kontostand);
         support.firePropertyChange("kontostand", oldKontostand, kontostand);
+        support.firePropertyChange("kontostandPositiv", oldKontostand >= 0, kontostand >= 0);
     }
 
     /**
@@ -134,12 +139,21 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
     }
 
     /**
+     * Checks if the account balance is positive.
+     *
+     * @return true if the account balance is positive, false otherwise
+     */
+    public boolean isKontostandPositiv() {
+        return kontostandPositiv.get();
+    }
+
+    /**
      * Returns the BooleanProperty that represents whether the account balance is positive.
      *
      * @return the BooleanProperty that represents whether the account balance is positive
      */
-    public BooleanProperty imPlusProperty() {
-        return imPlus;
+    public BooleanProperty isKontostandPositivProperty() {
+        return kontostandPositiv;
     }
 
     /**
@@ -161,6 +175,15 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
     }
 
     /**
+     * Returns the BooleanProperty that represents whether the account is locked or not.
+     *
+     * @return the BooleanProperty that represents whether the account is locked or not
+     */
+    public BooleanProperty gesperrtProperty() {
+        return gesperrt;
+    }
+
+    /**
      * Erhöht den Kontostand um den eingezahlten Betrag.
      *
      * @param betrag double
@@ -168,7 +191,7 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
      */
     public void einzahlen(double betrag) {
         if (betrag < 0 || !Doubles.isFinite(betrag)) {
-            throw new IllegalArgumentException("Falscher Betrag");
+            throw new IllegalArgumentException("Ungültiger Betrag");
         }
         setKontostand(getKontostand() + betrag);
     }
@@ -234,6 +257,7 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
      */
     public final void sperren() {
         gesperrt.set(true);
+        support.firePropertyChange("gesperrt", false, true);
     }
 
     /**
@@ -241,15 +265,7 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
      */
     public final void entsperren() {
         gesperrt.set(false);
-    }
-
-    /**
-     * Returns the BooleanProperty that represents whether the account is locked or not.
-     *
-     * @return the BooleanProperty that represents whether the account is locked or not
-     */
-    public BooleanProperty gesperrtProperty() {
-        return gesperrt;
+        support.firePropertyChange("entsperren", true, false);
     }
 
     /**
@@ -356,10 +372,12 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
      * @param neu die neue Währung, die mit dem Konto verknüpft werden soll
      */
     public void waehrungswechsel(Waehrung neu) {
+        Waehrung alt = this.waehrung;
         double kontostandInEUR = getAktuelleWaehrung().waehrungInEuroUmrechnen(getKontostand());
         setKontostand(neu.euroInWaehrungUmrechnen(kontostandInEUR));
 
         this.waehrung = neu;
+        support.firePropertyChange("waehrung", alt, neu);
     }
 
     /**
@@ -381,7 +399,7 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
                 }
                 kosten = kurs * anzahl;
                 if (kontostand.get() >= kosten) {
-                    kontostand.set(kontostand.getReadOnlyProperty().get() - kosten);
+                    setKontostand(kontostand.get() - kosten);
                     depot.put(aktie, depot.getOrDefault(aktie, 0) + anzahl);
                 } else {
                     kosten = 0;
@@ -414,7 +432,7 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
                             aktienKurs = aktie.getKurs();
                         }
                         double ertrag = aktienKurs * anzahl;
-                        kontostand.set(kontostand.getReadOnlyProperty().get() + ertrag);
+                        setKontostand(kontostand.get() + ertrag);
                         depot.remove(aktie);
                         gesamtErtrag += ertrag;
                     }
@@ -424,33 +442,34 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
         });
     }
 
-    @Serial
-    private void readObject(ObjectInputStream in) {
-        try {
-            in.defaultReadObject();
-            executorService = Executors.newFixedThreadPool(10);
-            depot = new ConcurrentHashMap<>();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+    public void anmelden(PropertyChangeListener listener) {
+        support.addPropertyChangeListener(listener);
+    }
+
+    public void abmelden(PropertyChangeListener listener) {
+        support.removePropertyChangeListener(listener);
     }
 
     @Serial
-    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
-        out.defaultWriteObject();
+    private void writeObject(ObjectOutputStream oos) throws IOException {
+        oos.defaultWriteObject();
+        oos.writeObject(kontostand.get());
+        oos.writeObject(gesperrt.get());
+        oos.writeObject(depot);
     }
-//
-//    protected void fireKontostandGeaendert(double alterKontostand, double neuerKontostand) {
-//        beobachter.foreach(b -> b.aktualisieren(this));
-//    }
-//
-//    public void anmelden(Beobachter<? super Konto> b) {
-//        if (b != null) {
-//            beobachter.add(b);
-//        }
-//    }
-//
-//    public void abmelden(Beobachter<? super Konto> b) {
-//        beobachter.remove(b);
-//    }
+
+    @Serial
+    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+        ois.defaultReadObject();
+        kontostand = new ReadOnlyDoubleWrapper((double) ois.readObject());
+        gesperrt = new SimpleBooleanProperty((boolean) ois.readObject());
+        Object obj = ois.readObject();
+        if (obj instanceof ConcurrentHashMap) {
+            depot = (ConcurrentHashMap<Aktie, Integer>) obj;
+        } else {
+            throw new InvalidObjectException("Expected ConcurrentHashMap for 'depot', got " + obj.getClass().getName());
+        }
+        support = new PropertyChangeSupport(this);
+        executorService = Executors.newFixedThreadPool(10);
+    }
 }

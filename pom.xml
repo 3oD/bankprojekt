@@ -129,7 +129,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>oberflaeche.KontoOberflaeche</mainClass>
+                    <mainClass>bankprojekt.oberflaeche.KontoController</mainClass>
                 </configuration>
             </plugin>
         </plugins>

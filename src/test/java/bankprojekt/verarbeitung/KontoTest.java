@@ -50,15 +50,15 @@ class KontoTest {
         girokonto.anmelden(mockListener);
 
         double oldKontostand = girokonto.getKontostand();
-        double newKontostand = 200.0;
-        girokonto.setKontostand(newKontostand);
+        double einzahlenSumme = 200.0;
+        girokonto.einzahlen(einzahlenSumme);
 
         ArgumentCaptor<PropertyChangeEvent> argument = ArgumentCaptor.forClass(PropertyChangeEvent.class);
         verify(mockListener).propertyChange(argument.capture());
 
         assertEquals("kontostand", argument.getValue().getPropertyName());
         assertEquals(oldKontostand, argument.getValue().getOldValue());
-        assertEquals(newKontostand, argument.getValue().getNewValue());
+        assertEquals(1200d, argument.getValue().getNewValue());
     }
 
     @Test

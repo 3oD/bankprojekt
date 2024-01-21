@@ -3,7 +3,7 @@ package bankprojekt.verarbeitung;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import java.io.Serializable;
+import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -33,8 +33,6 @@ public class Kunde implements Comparable<Kunde>, Serializable {
      */
     private static final String ANREDE;   //von der Idee her final, wegen der Verwendung des static-Blocks leider nicht möglich.
 
-    private final StringProperty adresseProperty = new SimpleStringProperty();
-
     /**
      * liefert die systemspezifische Anrede
      *
@@ -55,7 +53,7 @@ public class Kunde implements Comparable<Kunde>, Serializable {
     /**
      * Die Adresse
      */
-    private String adresse;
+    private transient StringProperty adresse;
     /**
      * Geburtstag
      */
@@ -82,7 +80,7 @@ public class Kunde implements Comparable<Kunde>, Serializable {
             throw new IllegalArgumentException("null als Parameter nich erlaubt");
         this.vorname = vorname;
         this.nachname = nachname;
-        this.adresse = adresse;
+        this.adresse = new SimpleStringProperty(adresse);
         this.geburtstag = gebdat;
 
         Runtime umgebung = Runtime.getRuntime();
@@ -113,7 +111,7 @@ public class Kunde implements Comparable<Kunde>, Serializable {
         String ausgabe;
         DateTimeFormatter df = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
         ausgabe = this.vorname + " " + this.nachname + System.lineSeparator();
-        ausgabe += this.adresse + System.lineSeparator();
+        ausgabe += this.adresse.get() + System.lineSeparator();
         ausgabe += df.format(this.geburtstag) + System.lineSeparator();
         return ausgabe;
     }
@@ -133,7 +131,7 @@ public class Kunde implements Comparable<Kunde>, Serializable {
      * @return Adresse des Kunden
      */
     public String getAdresse() {
-        return adresse;
+        return adresse.get();
     }
 
     /**
@@ -145,12 +143,16 @@ public class Kunde implements Comparable<Kunde>, Serializable {
     public void setAdresse(String adresse) {
         if (adresse == null)
             throw new IllegalArgumentException("Adresse darf nicht null sein");
-        this.adresse = adresse;
-        adresseProperty.set(adresse);
+        this.adresse.set(adresse);
     }
 
+    /**
+     * Returns the property for the address of the customer.
+     *
+     * @return the property for the address of the customer
+     */
     public StringProperty adresseProperty() {
-    	return adresseProperty;
+    	return adresse;
     }
 
     /**
@@ -214,5 +216,17 @@ public class Kunde implements Comparable<Kunde>, Serializable {
             ANREDE = "Hallo Benutzer!";
         else
             ANREDE = "Dear Customer!";
+    }
+
+    @Serial
+    private void writeObject(ObjectOutputStream oos) throws IOException {
+        oos.defaultWriteObject();
+        oos.writeObject(adresse.get());
+    }
+
+    @Serial
+    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+        ois.defaultReadObject();
+        adresse = new SimpleStringProperty((String) ois.readObject());
     }
 }
