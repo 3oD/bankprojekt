@@ -49,6 +49,9 @@ public class Bank implements Cloneable, Serializable {
      * @throws IllegalArgumentException if the factory or the owner is null
      */
     public long kontoErstellen(KontoFactory factory, Kunde inhaber) {
+        if (factory == null) {
+            throw new IllegalArgumentException("Invalid factory");
+        }
         long neueKontonummer = generiereEindeutigeKontonummer();
         Konto neuesKonto = factory.createKonto(inhaber, neueKontonummer);
         kontoMap.put(neueKontonummer, neuesKonto);

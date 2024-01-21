@@ -74,12 +74,13 @@ public class Sparbuch extends Konto {
     @Override
     protected boolean pruefeAbheben(double betrag) {
         LocalDate heute = LocalDate.now();
+        double bereits = this.bereitsAbgehoben;
         if (heute.getMonth() != zeitpunkt.getMonth() || heute.getYear() != zeitpunkt.getYear()) {
-            this.bereitsAbgehoben = 0;
+            bereits = 0;
         }
 
         return getKontostand() - betrag >= this.getAktuelleWaehrung().euroInWaehrungUmrechnen(Sparbuch.MIN_KONTOSTAND) &&
-                bereitsAbgehoben + betrag <= this.getAktuelleWaehrung().euroInWaehrungUmrechnen(Sparbuch.ABHEBESUMME);
+                bereits + betrag <= this.getAktuelleWaehrung().euroInWaehrungUmrechnen(Sparbuch.ABHEBESUMME);
     }
 
     @Override

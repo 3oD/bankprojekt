@@ -94,7 +94,7 @@
                             <goal>test-jar-no-fork</goal>
                         </goals>
                         <configuration>
-                            <finalName>quelltexte</finalName>
+                            <finalName>bankprojekt</finalName>
                         </configuration>
                     </execution>
                 </executions>

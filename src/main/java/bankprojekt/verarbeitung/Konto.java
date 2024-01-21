@@ -2,6 +2,8 @@ package bankprojekt.verarbeitung;
 
 import com.google.common.primitives.Doubles;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serial;
@@ -15,6 +17,7 @@ import java.util.concurrent.*;
 public abstract class Konto implements Comparable<Konto>, Serializable {
     @Serial
     private static final long serialVersionUID = 20240106L;
+    private final PropertyChangeSupport support = new PropertyChangeSupport(this);
     /**
      * der Kontoinhaber
      */
@@ -107,12 +110,14 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
     }
 
     /**
-     * setzt den aktuellen Kontostand
+     * setzt den aktuellen Kontostand.
      *
      * @param kontostand neuer Kontostand
      */
     protected void setKontostand(double kontostand) {
+        double oldKontostand = this.kontostand;
         this.kontostand = kontostand;
+        support.firePropertyChange("kontostand", oldKontostand, kontostand);
     }
 
     /**
@@ -398,5 +403,13 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    public void anmelden(PropertyChangeListener listener) {
+        support.addPropertyChangeListener(listener);
+    }
+
+    public void abmelden(PropertyChangeListener listener) {
+        support.removePropertyChangeListener(listener);
     }
 }

@@ -1,11 +1,17 @@
 package bankprojekt.verarbeitung;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.time.LocalDate;
 
 class KontoTest {
@@ -36,6 +42,23 @@ class KontoTest {
     @Test
     void testSetInhaberNull() {
         Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> girokonto.setInhaber(null));
+    }
+
+    @Test
+    void testSetKontostand() {
+        PropertyChangeListener mockListener = Mockito.mock(PropertyChangeListener.class);
+        girokonto.anmelden(mockListener);
+
+        double oldKontostand = girokonto.getKontostand();
+        double newKontostand = 200.0;
+        girokonto.setKontostand(newKontostand);
+
+        ArgumentCaptor<PropertyChangeEvent> argument = ArgumentCaptor.forClass(PropertyChangeEvent.class);
+        verify(mockListener).propertyChange(argument.capture());
+
+        assertEquals("kontostand", argument.getValue().getPropertyName());
+        assertEquals(oldKontostand, argument.getValue().getOldValue());
+        assertEquals(newKontostand, argument.getValue().getNewValue());
     }
 
     @Test

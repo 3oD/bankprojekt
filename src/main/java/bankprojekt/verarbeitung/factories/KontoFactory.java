@@ -13,6 +13,7 @@ public abstract class KontoFactory {
      *
      * @param inhaber the owner of the account
      * @return a new Konto object
+     * @throws IllegalArgumentException if inhaber is null
      */
     public abstract Konto createKonto(Kunde inhaber, long nummer);
 }
