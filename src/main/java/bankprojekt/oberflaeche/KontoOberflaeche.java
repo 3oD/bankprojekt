@@ -4,6 +4,8 @@ import bankprojekt.verarbeitung.Konto;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.binding.Bindings;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -157,22 +159,26 @@ public class KontoOberflaeche extends BorderPane {
 
         einzahlen = new Button("Einzahlen");
         aktionen.getChildren().add(einzahlen);
-        einzahlen.setOnAction(e -> controller.einzahlen());
+        einzahlen.setOnAction(c -> {
+            try {
+                controller.einzahlen(Double.parseDouble(betrag.getText()));
+            } catch (NumberFormatException e) {
+                displayError("Bitte geben Sie einen gültigen Betrag ein.");
+            }
+
+        });
 
         abheben = new Button("Abheben");
         aktionen.getChildren().add(abheben);
-        abheben.setOnAction(e -> controller.abheben());
+        abheben.setOnAction(c -> {
+            try {
+                controller.abheben(Double.parseDouble(betrag.getText()));
+            } catch (NumberFormatException e) {
+                displayError("Bitte geben Sie einen gültigen Betrag ein.");
+            }
+        });
 
         this.setBottom(aktionen);
-    }
-
-    /**
-     * Retrieves the TextField component for entering the betrag (amount).
-     *
-     * @return the TextField component for entering the betrag (amount)
-     */
-    public TextField getBetrag() {
-        return betrag;
     }
 
     /**

@@ -44,8 +44,7 @@ public class KontoController extends Application {
      * If any error occurs during the process, it displays an error message
      * using the 'displayError' method of the view.
      */
-    public void einzahlen() {
-        double betrag = Double.parseDouble(this.view.getBetrag().getText());
+    public void einzahlen(double betrag) {
         if (model.isGesperrt()){
             this.view.displayError("Fehler beim Einzahlen: Konto ist gesperrt");
             return;
@@ -65,8 +64,7 @@ public class KontoController extends Application {
      * If any error occurs during the process, it displays an error message
      * using the 'displayError' method of the view.
      */
-    public void abheben() {
-        double betrag = Double.parseDouble(this.view.getBetrag().getText());
+    public void abheben(double betrag) {
         try {
             boolean isSuccessful = this.model.abheben(betrag);
             if (!isSuccessful) {
@@ -78,6 +76,4 @@ public class KontoController extends Application {
             this.view.displayError(e.getMessage());
         }
     }
-
-
 }
