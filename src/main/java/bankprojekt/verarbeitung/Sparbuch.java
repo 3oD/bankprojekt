@@ -4,14 +4,14 @@ import java.time.LocalDate;
 
 /**
  * ein Sparbuch, d.h. ein Konto, das nur recht eingeschränkt genutzt
- * werden kann. Insbesondere darf man monatlich nur höchstens 2000€
- * abheben, wobei der Kontostand nie unter 0,50€ fallen darf.
+ * werden kann. Insbesondere darf man monatlich nur höchstens 2000 €
+ * abheben, wobei der Kontostand nie unter 0,50 € fallen darf.
  *
  * @author Doro
  */
 public class Sparbuch extends Konto {
     /**
-     * Zinssatz, mit dem das Sparbuch verzinst wird. 0,03 entspricht 3%
+     * Zinssatz, mit dem das Sparbuch verzinst wird. 0,03 entspricht 3 %
      */
     private final double zinssatz;
 

@@ -51,6 +51,8 @@ public class KontoController extends Application {
         }
         try {
             this.model.einzahlen(betrag);
+        } catch (NumberFormatException e) {
+            this.view.displayError("Fehler beim Einzahlen: Betrag ist keine Zahl");
         } catch (IllegalArgumentException e) {
             this.view.displayError("Fehler beim Einzahlen: " + e.getMessage());
         }
@@ -76,4 +78,6 @@ public class KontoController extends Application {
             this.view.displayError(e.getMessage());
         }
     }
+
+
 }
